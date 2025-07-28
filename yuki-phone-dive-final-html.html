@@ -1,0 +1,782 @@
+    <parameter name="title">Yuki's Phone Catch - Complete Standalone Game<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yuki's Phone Catch - Lake Como Rescue</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(180deg, #4a90e2 0%, #1e3a5f 100%);
+            color: white;
+            overflow: hidden;
+        }
+        
+        .game-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .menu-screen, .game-over-screen {
+            text-align: center;
+            max-width: 800px;
+        }
+        
+        .game-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        h1 {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            color: #ffd700;
+        }
+        
+        h2 {
+            font-size: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .instructions {
+            background: rgba(30, 58, 95, 0.8);
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin: 2rem 0;
+        }
+        
+        .controls {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+        }
+        
+        .tip {
+            color: #ffd700;
+            font-size: 1.1rem;
+        }
+        
+        button {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 10px;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background: #c0392b;
+        }
+        
+        .green-btn {
+            background: #27ae60;
+        }
+        
+        .green-btn:hover {
+            background: #229954;
+        }
+        
+        .blue-btn {
+            background: #3498db;
+        }
+        
+        .blue-btn:hover {
+            background: #2980b9;
+        }
+        
+        .yellow-btn {
+            background: #f39c12;
+            color: black;
+        }
+        
+        .yellow-btn:hover {
+            background: #e67e22;
+        }
+        
+        canvas {
+            border: 4px solid #ffd700;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+        }
+        
+        .game-ui {
+            margin-top: 1rem;
+            text-align: center;
+        }
+        
+        .stats {
+            background: rgba(30, 58, 95, 0.9);
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin: 1rem 0;
+        }
+        
+        .leaderboard {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-top: 2rem;
+            max-width: 600px;
+        }
+        
+        .leaderboard-section {
+            background: rgba(30, 58, 95, 0.8);
+            padding: 1.5rem;
+            border-radius: 10px;
+        }
+        
+        .leaderboard h3 {
+            color: #ffd700;
+            margin-bottom: 1rem;
+        }
+        
+        .leaderboard-entry {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+        
+        .name-input {
+            padding: 10px;
+            font-size: 1.1rem;
+            border-radius: 5px;
+            border: none;
+            margin: 10px;
+            color: black;
+            max-width: 200px;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .difficulty-indicator {
+            background: rgba(231, 76, 60, 0.8);
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            margin: 0.5rem 0;
+            font-weight: bold;
+        }
+        
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.5rem;
+            }
+            
+            .leaderboard {
+                grid-template-columns: 1fr;
+            }
+            
+            canvas {
+                width: 100%;
+                max-width: 400px;
+                height: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <!-- Menu Screen -->
+        <div id="menu-screen" class="menu-screen">
+            <h1>🏎️ Yuki's Phone Catch</h1>
+            <h2>Lake Como Rescue Mission</h2>
+            <div class="instructions">
+                <p style="font-size: 1.2rem; margin-bottom: 1.5rem;">
+                    Help Yuki Tsunoda dive underwater to catch his phones before they sink to the bottom of Lake Como! 
+                    Navigate around obstacles, collect Red Bull power-ups for invincibility, and see how many phones you can save!
+                </p>
+                <div class="controls">
+                    <strong>Controls:</strong> Arrow Keys or WASD to move Yuki underwater
+                </div>
+                <div class="tip">💡 Red Bull cans give 10 seconds of invincibility!</div>
+                <div class="difficulty-indicator">
+                    ⚡ Game gets progressively harder every 30 seconds!
+                </div>
+            </div>
+            <button onclick="startGame()">Start Diving! 🤿</button>
+            <div id="leaderboard-display" class="leaderboard hidden">
+                <div class="leaderboard-section">
+                    <h3>📱 Most Phones Caught</h3>
+                    <div id="phones-leaderboard"></div>
+                </div>
+                <div class="leaderboard-section">
+                    <h3>⚡ Longest Run</h3>
+                    <div id="time-leaderboard"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Game Screen -->
+        <div id="game-screen" class="game-screen hidden">
+            <canvas id="gameCanvas" width="800" height="600"></canvas>
+            <div class="game-ui">
+                <div class="controls">Use Arrow Keys or WASD to move Yuki around!</div>
+                <div class="tip">Catch the phones, avoid obstacles, grab Red Bull for power!</div>
+                <div id="difficulty-display" class="difficulty-indicator">
+                    Difficulty: Normal
+                </div>
+            </div>
+        </div>
+
+        <!-- Game Over Screen -->
+        <div id="game-over-screen" class="game-over-screen hidden">
+            <h1>Game Over!</h1>
+            <p style="font-size: 1.5rem; margin-bottom: 2rem;">Yuki hit an obstacle! 💥</p>
+            <div class="stats">
+                <h3>Final Stats:</h3>
+                <p style="font-size: 1.2rem;">📱 Phones Caught: <span id="final-score" style="color: #ffd700; font-weight: bold;">0</span></p>
+                <p style="font-size: 1.2rem;">⏱️ Time Survived: <span id="final-time" style="color: #ffd700; font-weight: bold;">0s</span></p>
+                <p style="font-size: 1.1rem;">🎯 Difficulty Reached: <span id="final-difficulty" style="color: #ffd700; font-weight: bold;">Normal</span></p>
+            </div>
+            
+            <div id="score-buttons">
+                <button class="green-btn" onclick="showNameInput()">Save to Leaderboard 🏆</button>
+                <button onclick="startGame()">Try Again! 🔄</button>
+                <button class="blue-btn" onclick="showMenu()">Main Menu</button>
+            </div>
+            
+            <div id="name-input-section" class="hidden">
+                <input type="text" id="player-name" class="name-input" placeholder="Enter your name" maxlength="20">
+                <br>
+                <button class="green-btn" onclick="submitScore()">Submit Score! 🚀</button>
+                <button onclick="hideNameInput()">Cancel</button>
+            </div>
+            
+            <p style="font-size: 1.2rem; margin-top: 2rem; color: #ffd700;">
+                "Maybe I should've used a waterproof case!" - Yuki 📱💧
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // Game variables
+        let gameState = 'menu';
+        let canvas, ctx;
+        let animationId;
+        let keys = {};
+        let leaderboard = { mostPhones: [], bestTime: [] };
+        
+        const game = {
+            yuki: { x: 400, y: 500, width: 40, height: 62, speed: 5 },
+            phones: [],
+            obstacles: [],
+            powerUps: [],
+            particles: [],
+            score: 0,
+            gameRunning: false,
+            invincible: false,
+            invincibleTime: 0,
+            gameStartTime: 0,
+            lastPhoneSpawn: 0,
+            lastObstacleSpawn: 0,
+            lastPowerUpSpawn: 0,
+            screenShake: 0
+        };
+
+        // Initialize game
+        window.onload = function() {
+            canvas = document.getElementById('gameCanvas');
+            ctx = canvas.getContext('2d');
+            
+            // Load leaderboard from localStorage
+            const saved = localStorage.getItem('yukiPhoneCatchLeaderboard');
+            if (saved) {
+                leaderboard = JSON.parse(saved);
+                updateLeaderboardDisplay();
+            }
+        };
+
+        // Input handling
+        document.addEventListener('keydown', (e) => {
+            keys[e.key.toLowerCase()] = true;
+        });
+
+        document.addEventListener('keyup', (e) => {
+            keys[e.key.toLowerCase()] = false;
+        });
+
+        // Screen management
+        function showScreen(screenId) {
+            document.querySelectorAll('.menu-screen, .game-screen, .game-over-screen').forEach(s => s.classList.add('hidden'));
+            document.getElementById(screenId).classList.remove('hidden');
+        }
+
+        function showMenu() {
+            gameState = 'menu';
+            showScreen('menu-screen');
+            updateLeaderboardDisplay();
+        }
+
+        function showNameInput() {
+            document.getElementById('score-buttons').classList.add('hidden');
+            document.getElementById('name-input-section').classList.remove('hidden');
+        }
+
+        function hideNameInput() {
+            document.getElementById('score-buttons').classList.remove('hidden');
+            document.getElementById('name-input-section').classList.add('hidden');
+        }
+
+        // Difficulty management
+        function getDifficultyInfo(gameTimeSeconds) {
+            if (gameTimeSeconds >= 90) {
+                return { name: "INSANE", color: "#ff0000" };
+            } else if (gameTimeSeconds >= 60) {
+                return { name: "HARD", color: "#ff6600" };
+            } else if (gameTimeSeconds >= 30) {
+                return { name: "MEDIUM", color: "#ffaa00" };
+            }
+            return { name: "NORMAL", color: "#00ff00" };
+        }
+
+        function updateDifficultyDisplay(gameTimeSeconds) {
+            const difficultyInfo = getDifficultyInfo(gameTimeSeconds);
+            const display = document.getElementById('difficulty-display');
+            if (display) {
+                display.textContent = `Difficulty: ${difficultyInfo.name}`;
+                display.style.backgroundColor = difficultyInfo.color + '80'; // Add transparency
+            }
+        }
+
+        // Game functions
+        function createParticles(x, y, color, count = 8) {
+            const particles = [];
+            for (let i = 0; i < count; i++) {
+                particles.push({
+                    x: x,
+                    y: y,
+                    vx: (Math.random() - 0.5) * 10,
+                    vy: (Math.random() - 0.5) * 10,
+                    color: color,
+                    life: 30,
+                    maxLife: 30
+                });
+            }
+            return particles;
+        }
+
+        function startGame() {
+            // Reset game state
+            game.yuki = { x: 400, y: 500, width: 40, height: 62, speed: 5 };
+            game.phones = [];
+            game.obstacles = [];
+            game.powerUps = [];
+            game.particles = [];
+            game.score = 0;
+            game.gameRunning = true;
+            game.invincible = false;
+            game.invincibleTime = 0;
+            game.gameStartTime = Date.now();
+            game.lastPhoneSpawn = 0;
+            game.lastObstacleSpawn = 0;
+            game.lastPowerUpSpawn = 0;
+            game.screenShake = 0;
+            
+            gameState = 'playing';
+            showScreen('game-screen');
+            gameLoop();
+        }
+
+        function gameLoop() {
+            if (!game.gameRunning) return;
+            
+            updateGame();
+            drawGame();
+            animationId = requestAnimationFrame(gameLoop);
+        }
+
+        function updateGame() {
+            const currentTime = Date.now();
+            const gameTimeSeconds = (currentTime - game.gameStartTime) / 1000;
+            
+            // Update difficulty display
+            updateDifficultyDisplay(gameTimeSeconds);
+            
+            // Update invincibility
+            if (game.invincible) {
+                game.invincibleTime -= 16;
+                if (game.invincibleTime <= 0) {
+                    game.invincible = false;
+                }
+            }
+
+            // Update screen shake
+            if (game.screenShake > 0) {
+                game.screenShake--;
+            }
+
+            // Move Yuki
+            const speed = game.invincible ? game.yuki.speed * 1.5 : game.yuki.speed;
+            if (keys['arrowleft'] || keys['a']) {
+                game.yuki.x = Math.max(0, game.yuki.x - speed);
+            }
+            if (keys['arrowright'] || keys['d']) {
+                game.yuki.x = Math.min(760, game.yuki.x + speed);
+            }
+            if (keys['arrowup'] || keys['w']) {
+                game.yuki.y = Math.max(0, game.yuki.y - speed);
+            }
+            if (keys['arrowdown'] || keys['s']) {
+                game.yuki.y = Math.min(538, game.yuki.y + speed);
+            }
+
+            // Spawn entities
+            spawnPhone(currentTime);
+            spawnObstacle(currentTime);
+            spawnPowerUp(currentTime);
+
+            // Move entities
+            game.phones.forEach(phone => phone.y += phone.speed);
+            game.obstacles.forEach(obstacle => obstacle.y += obstacle.speed);
+            game.powerUps.forEach(powerUp => powerUp.y += powerUp.speed);
+
+            // Update particles
+            game.particles = game.particles.filter(particle => {
+                particle.x += particle.vx;
+                particle.y += particle.vy;
+                particle.vx *= 0.98;
+                particle.vy *= 0.98;
+                particle.life--;
+                return particle.life > 0;
+            });
+
+            checkCollisions();
+        }
+
+        function spawnPhone(currentTime) {
+            if (currentTime - game.lastPhoneSpawn > 2000) {
+                const numPhones = Math.min(3, Math.floor(currentTime / 10000) + 1);
+                for (let i = 0; i < numPhones; i++) {
+                    game.phones.push({
+                        x: Math.random() * 760 + 20,
+                        y: -30,
+                        width: 25,
+                        height: 35,
+                        speed: 2 + Math.random() * 2
+                    });
+                }
+                game.lastPhoneSpawn = currentTime;
+            }
+        }
+
+        function spawnObstacle(currentTime) {
+            // Progressive difficulty based on game time
+            const gameTimeSeconds = (currentTime - game.gameStartTime) / 1000;
+            let spawnInterval = 1500; // Default spawn interval (ms)
+            let speedMultiplier = 1; // Speed multiplier for obstacles
+            
+            // Increase difficulty every 30 seconds
+            if (gameTimeSeconds >= 90) {
+                spawnInterval = 600; // Very frequent spawning
+                speedMultiplier = 1.8;
+            } else if (gameTimeSeconds >= 60) {
+                spawnInterval = 900; // More frequent spawning
+                speedMultiplier = 1.5;
+            } else if (gameTimeSeconds >= 30) {
+                spawnInterval = 1200; // Slightly more frequent
+                speedMultiplier = 1.2;
+            }
+            
+            if (currentTime - game.lastObstacleSpawn > spawnInterval) {
+                const obstacleTypes = ['fish', 'rock', 'debris'];
+                const type = obstacleTypes[Math.floor(Math.random() * obstacleTypes.length)];
+                game.obstacles.push({
+                    x: Math.random() * 760 + 20,
+                    y: -30,
+                    width: 30 + Math.random() * 20,
+                    height: 30 + Math.random() * 20,
+                    speed: (1.5 + Math.random() * 1.5) * speedMultiplier,
+                    type: type
+                });
+                game.lastObstacleSpawn = currentTime;
+            }
+        }
+
+        function spawnPowerUp(currentTime) {
+            if (currentTime - game.lastPowerUpSpawn > 8000) {
+                game.powerUps.push({
+                    x: Math.random() * 760 + 20,
+                    y: -30,
+                    width: 25,
+                    height: 30,
+                    speed: 1.5
+                });
+                game.lastPowerUpSpawn = currentTime;
+            }
+        }
+
+        function checkCollisions() {
+            // Check phone collisions
+            game.phones = game.phones.filter(phone => {
+                if (phone.x < game.yuki.x + game.yuki.width &&
+                    phone.x + phone.width > game.yuki.x &&
+                    phone.y < game.yuki.y + game.yuki.height &&
+                    phone.y + phone.height > game.yuki.y) {
+                    game.score++;
+                    game.particles.push(...createParticles(phone.x + phone.width/2, phone.y + phone.height/2, '#00ff00', 12));
+                    return false;
+                }
+                return phone.y < 600;
+            });
+
+            // Check power-up collisions
+            game.powerUps = game.powerUps.filter(powerUp => {
+                if (powerUp.x < game.yuki.x + game.yuki.width &&
+                    powerUp.x + powerUp.width > game.yuki.x &&
+                    powerUp.y < game.yuki.y + game.yuki.height &&
+                    powerUp.y + powerUp.height > game.yuki.y) {
+                    game.invincible = true;
+                    game.invincibleTime = 10000;
+                    game.particles.push(...createParticles(powerUp.x + powerUp.width/2, powerUp.y + powerUp.height/2, '#ff0000', 15));
+                    return false;
+                }
+                return powerUp.y < 600;
+            });
+
+            // Check obstacle collisions
+            if (!game.invincible) {
+                for (let obstacle of game.obstacles) {
+                    if (obstacle.x < game.yuki.x + game.yuki.width &&
+                        obstacle.x + obstacle.width > game.yuki.x &&
+                        obstacle.y < game.yuki.y + game.yuki.height &&
+                        obstacle.y + obstacle.height > game.yuki.y) {
+                        endGame();
+                        return;
+                    }
+                }
+            }
+
+            game.obstacles = game.obstacles.filter(obstacle => obstacle.y < 600);
+        }
+
+        function endGame() {
+            game.gameRunning = false;
+            game.screenShake = 20;
+            cancelAnimationFrame(animationId);
+            
+            const finalTime = Math.floor((Date.now() - game.gameStartTime) / 1000);
+            const difficultyInfo = getDifficultyInfo(finalTime);
+            
+            document.getElementById('final-score').textContent = game.score;
+            document.getElementById('final-time').textContent = finalTime + 's';
+            document.getElementById('final-difficulty').textContent = difficultyInfo.name;
+            
+            gameState = 'gameOver';
+            showScreen('game-over-screen');
+        }
+
+        function drawGame() {
+            // Clear canvas
+            ctx.clearRect(0, 0, 800, 600);
+
+            // Apply screen shake
+            if (game.screenShake > 0) {
+                ctx.save();
+                ctx.translate(
+                    (Math.random() - 0.5) * game.screenShake,
+                    (Math.random() - 0.5) * game.screenShake
+                );
+            }
+
+            // Draw underwater background
+            const gradient = ctx.createLinearGradient(0, 0, 0, 600);
+            gradient.addColorStop(0, '#4a90e2');
+            gradient.addColorStop(1, '#1e3a5f');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, 800, 600);
+
+            // Draw bubbles
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+            for (let i = 0; i < 20; i++) {
+                const x = (Date.now() / 50 + i * 40) % 800;
+                const y = (Date.now() / 30 + i * 30) % 600;
+                ctx.beginPath();
+                ctx.arc(x, y, 3 + Math.sin(Date.now() / 1000 + i) * 2, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            // Draw Yuki as a person
+            const yukiX = game.yuki.x;
+            const yukiY = game.yuki.y;
+            
+            if (game.invincible) {
+                ctx.shadowColor = '#ff0000';
+                ctx.shadowBlur = 15;
+            }
+
+            // Helmet
+            ctx.fillStyle = '#1a1a1a';
+            ctx.beginPath();
+            ctx.arc(yukiX + 20, yukiY + 10, 12, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Helmet visor
+            ctx.fillStyle = '#4a90e2';
+            ctx.beginPath();
+            ctx.arc(yukiX + 20, yukiY + 10, 8, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Head/neck
+            ctx.fillStyle = '#fdbcb4';
+            ctx.fillRect(yukiX + 16, yukiY + 20, 8, 6);
+
+            // Body (Red Bull swimsuit)
+            ctx.fillStyle = game.invincible ? '#ff6b6b' : '#e74c3c';
+            ctx.fillRect(yukiX + 12, yukiY + 26, 16, 20);
+            
+            // Red Bull logo on chest
+            ctx.fillStyle = '#ffd700';
+            ctx.font = 'bold 8px Arial';
+            ctx.fillText('RB', yukiX + 17, yukiY + 36);
+
+            // Arms
+            ctx.fillStyle = game.invincible ? '#ff6b6b' : '#e74c3c';
+            ctx.fillRect(yukiX + 6, yukiY + 28, 6, 12);
+            ctx.fillRect(yukiX + 28, yukiY + 28, 6, 12);
+            
+            // Hands
+            ctx.fillStyle = '#fdbcb4';
+            ctx.beginPath();
+            ctx.arc(yukiX + 9, yukiY + 42, 3, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.arc(yukiX + 31, yukiY + 42, 3, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Legs
+            ctx.fillStyle = game.invincible ? '#ff6b6b' : '#e74c3c';
+            ctx.fillRect(yukiX + 14, yukiY + 46, 5, 12);
+            ctx.fillRect(yukiX + 21, yukiY + 46, 5, 12);
+            
+            // Fins/feet
+            ctx.fillStyle = '#2c3e50';
+            ctx.fillRect(yukiX + 12, yukiY + 58, 8, 4);
+            ctx.fillRect(yukiX + 20, yukiY + 58, 8, 4);
+            
+            ctx.shadowBlur = 0;
+
+            // Draw phones
+            ctx.fillStyle = '#2c3e50';
+            game.phones.forEach(phone => {
+                ctx.fillRect(phone.x, phone.y, phone.width, phone.height);
+                ctx.fillStyle = '#3498db';
+                ctx.fillRect(phone.x + 2, phone.y + 2, phone.width - 4, phone.height - 8);
+                ctx.fillStyle = '#2c3e50';
+            });
+
+            // Draw obstacles
+            game.obstacles.forEach(obstacle => {
+                if (obstacle.type === 'fish') {
+                    ctx.fillStyle = '#f39c12';
+                    ctx.beginPath();
+                    ctx.ellipse(obstacle.x + obstacle.width/2, obstacle.y + obstacle.height/2, 
+                               obstacle.width/2, obstacle.height/3, 0, 0, Math.PI * 2);
+                    ctx.fill();
+                } else if (obstacle.type === 'rock') {
+                    ctx.fillStyle = '#7f8c8d';
+                    ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
+                } else {
+                    ctx.fillStyle = '#8b4513';
+                    ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
+                }
+            });
+
+            // Draw Red Bull power-ups
+            ctx.fillStyle = '#ff0000';
+            game.powerUps.forEach(powerUp => {
+                ctx.fillRect(powerUp.x, powerUp.y, powerUp.width, powerUp.height);
+                ctx.fillStyle = '#ffffff';
+                ctx.font = '10px Arial';
+                ctx.fillText('RB', powerUp.x + 7, powerUp.y + 18);
+                ctx.fillStyle = '#ff0000';
+            });
+
+            // Draw particles
+            game.particles.forEach(particle => {
+                const alpha = particle.life / particle.maxLife;
+                ctx.fillStyle = particle.color + Math.floor(alpha * 255).toString(16).padStart(2, '0');
+                ctx.fillRect(particle.x - 2, particle.y - 2, 4, 4);
+            });
+
+            if (game.screenShake > 0) {
+                ctx.restore();
+            }
+
+            // Draw UI
+            ctx.fillStyle = 'white';
+            ctx.font = 'bold 20px Arial';
+            ctx.fillText(`Phones: ${game.score}`, 20, 40);
+            ctx.fillText(`Time: ${Math.floor((Date.now() - game.gameStartTime) / 1000)}s`, 20, 70);
+            
+            if (game.invincible) {
+                ctx.fillStyle = '#ff6b6b';
+                ctx.fillText(`Red Bull Power: ${Math.ceil(game.invincibleTime / 1000)}s`, 20, 100);
+            }
+        }
+
+        function submitScore() {
+            const finalTime = Math.floor((Date.now() - game.gameStartTime) / 1000);
+            const playerName = document.getElementById('player-name').value || 'Anonymous';
+            
+            const newEntry = {
+                name: playerName,
+                score: game.score,
+                time: finalTime,
+                date: new Date().toLocaleDateString()
+            };
+
+            leaderboard.mostPhones.push(newEntry);
+            leaderboard.mostPhones.sort((a, b) => b.score - a.score);
+            leaderboard.mostPhones = leaderboard.mostPhones.slice(0, 10);
+
+            if (game.score > 0) {
+                leaderboard.bestTime.push(newEntry);
+                leaderboard.bestTime.sort((a, b) => a.time - b.time);
+                leaderboard.bestTime = leaderboard.bestTime.slice(0, 10);
+            }
+
+            // Save to localStorage
+            localStorage.setItem('yukiPhoneCatchLeaderboard', JSON.stringify(leaderboard));
+
+            hideNameInput();
+            showMenu();
+        }
+
+        function updateLeaderboardDisplay() {
+            const phonesDiv = document.getElementById('phones-leaderboard');
+            const timeDiv = document.getElementById('time-leaderboard');
+            
+            if (leaderboard.mostPhones.length > 0 || leaderboard.bestTime.length > 0) {
+                document.getElementById('leaderboard-display').classList.remove('hidden');
+            }
+
+            if (leaderboard.mostPhones.length > 0) {
+                phonesDiv.innerHTML = leaderboard.mostPhones.slice(0, 5).map(entry => 
+                    `<div class="leaderboard-entry"><span>${entry.name}</span><span>${entry.score} phones</span></div>`
+                ).join('');
+            }
+
+            if (leaderboard.bestTime.length > 0) {
+                timeDiv.innerHTML = leaderboard.bestTime.slice(0, 5).map(entry => 
+                    `<div class="leaderboard-entry"><span>${entry.name}</span><span>${entry.time}s</span></div>`
+                ).join('');
+            }
+        }
+    </script>
+</body>
+</html>
