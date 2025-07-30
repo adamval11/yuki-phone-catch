@@ -4,6 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Yuki's Phone Catch - Lake Como Rescue</title>
+    
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-BEWXGM4DF4"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-BEWXGM4DF4');
+    </script>
     <style>
         * {
             margin: 0;
@@ -553,6 +562,14 @@
         }
 
         function showNameInput() {
+            // Track leaderboard interest
+            if (typeof gtag !== 'undefined') {
+                gtag('event', 'leaderboard_interest', {
+                    'event_category': 'engagement',
+                    'event_label': 'save_score_clicked'
+                });
+            }
+            
             document.getElementById('score-buttons').classList.add('hidden');
             document.getElementById('name-input-section').classList.remove('hidden');
             
@@ -618,6 +635,14 @@
         }
 
         function startGame() {
+            // Track game start
+            if (typeof gtag !== 'undefined') {
+                gtag('event', 'game_start', {
+                    'event_category': 'game',
+                    'event_label': 'yuki_phone_catch'
+                });
+            }
+            
             // Reset game state
             game.yuki = { x: 400, y: 500, width: 40, height: 62, speed: 5 };
             game.phones = [];
@@ -807,6 +832,20 @@
             
             const finalTime = Math.floor((Date.now() - game.gameStartTime) / 1000);
             const difficultyInfo = getDifficultyInfo(finalTime);
+            
+            // Track game completion
+            if (typeof gtag !== 'undefined') {
+                gtag('event', 'game_complete', {
+                    'event_category': 'game',
+                    'event_label': 'yuki_phone_catch',
+                    'value': game.score,
+                    'custom_parameters': {
+                        'phones_caught': game.score,
+                        'survival_time': finalTime,
+                        'difficulty_reached': difficultyInfo.name
+                    }
+                });
+            }
             
             document.getElementById('final-score').textContent = game.score;
             document.getElementById('final-time').textContent = finalTime + 's';
@@ -1014,6 +1053,20 @@
                 const success = await submitScoreToFirebase(playerName, game.score, finalTime);
                 
                 if (success) {
+                    // Track successful leaderboard submission
+                    if (typeof gtag !== 'undefined') {
+                        gtag('event', 'leaderboard_submit', {
+                            'event_category': 'engagement',
+                            'event_label': 'global_leaderboard',
+                            'value': game.score,
+                            'custom_parameters': {
+                                'player_name': playerName,
+                                'phones_caught': game.score,
+                                'survival_time': finalTime
+                            }
+                        });
+                    }
+                    
                     submitBtn.textContent = 'Submitted! 🎉';
                     setTimeout(() => {
                         // Reset button state before going to menu
