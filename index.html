@@ -282,6 +282,9 @@
                 <br>
                 <button class="green-btn" onclick="submitScore()" id="submit-btn">Submit to Global Leaderboard! 🚀</button>
                 <button onclick="hideNameInput()">Cancel</button>
+                <div style="margin-top: 10px; font-size: 0.9rem; color: #bbb;">
+                    💡 Tip: Press Enter to submit quickly!
+                </div>
             </div>
             
             <p style="font-size: 1.2rem; margin-top: 2rem; color: #ffd700;">
@@ -471,6 +474,14 @@
         // Input handling
         document.addEventListener('keydown', (e) => {
             keys[e.key.toLowerCase()] = true;
+            
+            // Handle Enter key in name input
+            if (e.key === 'Enter' && document.getElementById('name-input-section').style.display !== 'none') {
+                const nameInput = document.getElementById('player-name');
+                if (document.activeElement === nameInput && nameInput.value.trim()) {
+                    submitScore();
+                }
+            }
         });
 
         document.addEventListener('keyup', (e) => {
@@ -486,16 +497,49 @@
         function showMenu() {
             gameState = 'menu';
             showScreen('menu-screen');
+            
+            // Reset any form states when returning to menu
+            const submitBtn = document.getElementById('submit-btn');
+            const nameInput = document.getElementById('player-name');
+            
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Submit to Global Leaderboard! 🚀';
+            }
+            if (nameInput) {
+                nameInput.value = '';
+            }
+            
+            // Make sure score buttons are visible and name input is hidden
+            document.getElementById('score-buttons').classList.remove('hidden');
+            document.getElementById('name-input-section').classList.add('hidden');
         }
 
         function showNameInput() {
             document.getElementById('score-buttons').classList.add('hidden');
             document.getElementById('name-input-section').classList.remove('hidden');
+            
+            // Reset form state
+            const submitBtn = document.getElementById('submit-btn');
+            const nameInput = document.getElementById('player-name');
+            
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Submit to Global Leaderboard! 🚀';
+            nameInput.value = ''; // Clear previous name
+            nameInput.focus(); // Focus on input
         }
 
         function hideNameInput() {
             document.getElementById('score-buttons').classList.remove('hidden');
             document.getElementById('name-input-section').classList.add('hidden');
+            
+            // Reset form state
+            const submitBtn = document.getElementById('submit-btn');
+            const nameInput = document.getElementById('player-name');
+            
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Submit to Global Leaderboard! 🚀';
+            nameInput.value = '';
         }
 
         // Difficulty management
@@ -935,6 +979,9 @@
                 if (success) {
                     submitBtn.textContent = 'Submitted! 🎉';
                     setTimeout(() => {
+                        // Reset button state before going to menu
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = 'Submit to Global Leaderboard! 🚀';
                         hideNameInput();
                         showMenu();
                     }, 1500);
@@ -968,6 +1015,9 @@
                 
                 submitBtn.textContent = 'Saved Locally (Network Error)';
                 setTimeout(() => {
+                    // Reset button state before going to menu
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Submit to Global Leaderboard! 🚀';
                     hideNameInput();
                     showMenu();
                 }, 2000);
