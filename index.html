@@ -74,7 +74,7 @@
 
         // Console logging function
         function log(message, type = 'info') {
-            const console = document.getElementById('console');
+            const consoleDiv = document.getElementById('console');
             const time = new Date().toLocaleTimeString();
             const colors = {
                 info: '#3498db',
@@ -82,9 +82,9 @@
                 error: '#e74c3c',
                 warning: '#f39c12'
             };
-            console.innerHTML += `<div style="color: ${colors[type]};">[${time}] ${message}</div>`;
-            console.scrollTop = console.scrollHeight;
-            console.log(message);
+            consoleDiv.innerHTML += `<div style="color: ${colors[type]};">[${time}] ${message}</div>`;
+            consoleDiv.scrollTop = consoleDiv.scrollHeight;
+            window.console.log(message); // Use window.console explicitly
         }
 
         // Firebase configuration
@@ -217,6 +217,10 @@
         window.clearConsole = function() {
             document.getElementById('console').innerHTML = '';
         };
+
+    </script>
+</body>
+</html>
 
     </script>
 </body>
