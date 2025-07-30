@@ -3,297 +3,89 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Yuki's Phone Catch - Lake Como Rescue</title>
+    <title>Firebase Test</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
         body {
             font-family: Arial, sans-serif;
-            background: linear-gradient(180deg, #4a90e2 0%, #1e3a5f 100%);
-            color: white;
-            overflow: hidden;
-        }
-        
-        .game-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
             padding: 20px;
-        }
-        
-        .menu-screen, .game-over-screen {
-            text-align: center;
-            max-width: 900px;
-        }
-        
-        .game-screen {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        
-        h1 {
-            font-size: 4rem;
-            margin-bottom: 1rem;
-            color: #ffd700;
-        }
-        
-        h2 {
-            font-size: 2rem;
-            margin-bottom: 2rem;
-        }
-        
-        .instructions {
-            background: rgba(30, 58, 95, 0.8);
-            padding: 1.5rem;
-            border-radius: 10px;
-            margin: 2rem 0;
-        }
-        
-        .controls {
-            font-size: 1.2rem;
-            margin-bottom: 1rem;
-        }
-        
-        .tip {
-            color: #ffd700;
-            font-size: 1.1rem;
-        }
-        
-        button {
-            background: #e74c3c;
+            background: #2c3e50;
             color: white;
-            border: none;
-            padding: 15px 30px;
-            font-size: 1.2rem;
-            border-radius: 8px;
-            cursor: pointer;
-            margin: 10px;
-            transition: background-color 0.3s;
         }
-        
-        button:hover {
-            background: #c0392b;
-        }
-        
-        .green-btn {
-            background: #27ae60;
-        }
-        
-        .green-btn:hover {
-            background: #229954;
-        }
-        
-        .blue-btn {
-            background: #3498db;
-        }
-        
-        .blue-btn:hover {
-            background: #2980b9;
-        }
-        
-        canvas {
-            border: 4px solid #ffd700;
-            border-radius: 10px;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
-        }
-        
-        .game-ui {
-            margin-top: 1rem;
-            text-align: center;
-        }
-        
-        .stats {
-            background: rgba(30, 58, 95, 0.9);
-            padding: 1.5rem;
-            border-radius: 10px;
-            margin: 1rem 0;
-        }
-        
-        .leaderboard {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 2rem;
-            margin-top: 2rem;
-            max-width: 700px;
-        }
-        
-        .leaderboard-section {
-            background: rgba(30, 58, 95, 0.8);
-            padding: 1.5rem;
-            border-radius: 10px;
-        }
-        
-        .leaderboard h3 {
-            color: #ffd700;
-            margin-bottom: 1rem;
-        }
-        
-        .leaderboard-entry {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 0.5rem;
-            padding: 0.25rem 0;
-        }
-        
-        .leaderboard-entry.highlight {
-            background: rgba(255, 215, 0, 0.2);
-            border-radius: 4px;
-            padding: 0.5rem;
-            margin: 0.25rem -0.5rem;
-        }
-        
-        .name-input {
-            padding: 10px;
-            font-size: 1.1rem;
+        .status {
+            padding: 15px;
+            margin: 10px 0;
             border-radius: 5px;
-            border: none;
-            margin: 10px;
-            color: black;
-            max-width: 200px;
-        }
-        
-        .hidden {
-            display: none;
-        }
-        
-        .difficulty-indicator {
-            background: rgba(231, 76, 60, 0.8);
-            padding: 0.5rem 1rem;
-            border-radius: 5px;
-            margin: 0.5rem 0;
             font-weight: bold;
         }
-        
-        .firebase-status {
-            background: rgba(46, 204, 113, 0.8);
-            padding: 0.5rem 1rem;
+        .success { background: #27ae60; }
+        .error { background: #e74c3c; }
+        .info { background: #3498db; }
+        .warning { background: #f39c12; }
+        button {
+            padding: 10px 20px;
+            margin: 10px 5px;
+            border: none;
             border-radius: 5px;
-            margin: 1rem 0;
-            font-size: 0.9rem;
+            background: #3498db;
+            color: white;
+            cursor: pointer;
+            font-size: 16px;
         }
-        
-        .firebase-status.error {
-            background: rgba(231, 76, 60, 0.8);
-        }
-        
-        .loading {
-            opacity: 0.7;
-        }
-        
-        @media (max-width: 768px) {
-            h1 {
-                font-size: 2.5rem;
-            }
-            
-            .leaderboard {
-                grid-template-columns: 1fr;
-            }
-            
-            canvas {
-                width: 100%;
-                max-width: 400px;
-                height: auto;
-            }
+        button:hover { background: #2980b9; }
+        .test-results {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 5px;
         }
     </style>
 </head>
 <body>
-    <div class="game-container">
-        <!-- Menu Screen -->
-        <div id="menu-screen" class="menu-screen">
-            <h1>🏎️ Yuki's Phone Catch</h1>
-            <h2>Lake Como Rescue Mission</h2>
-            <div class="firebase-status" id="firebase-status">
-                🔄 Connecting to global leaderboard...
-            </div>
-            <div class="instructions">
-                <p style="font-size: 1.2rem; margin-bottom: 1.5rem;">
-                    Help Yuki Tsunoda dive underwater to catch his phones before they sink to the bottom of Lake Como! 
-                    Navigate around obstacles, collect Red Bull power-ups for invincibility, and compete globally!
-                </p>
-                <div class="controls">
-                    <strong>Controls:</strong> Arrow Keys or WASD to move Yuki underwater
-                </div>
-                <div class="tip">💡 Red Bull cans give 10 seconds of invincibility!</div>
-                <div class="difficulty-indicator">
-                    ⚡ Game gets progressively harder every 30 seconds!
-                </div>
-            </div>
-            <button onclick="startGame()">Start Diving! 🤿</button>
-            
-            <!-- Global Leaderboard -->
-            <div class="leaderboard">
-                <div class="leaderboard-section">
-                    <h3>📱 Most Phones Caught (Global)</h3>
-                    <div id="phones-leaderboard" class="loading">
-                        <div class="leaderboard-entry"><span>Loading global scores...</span><span>-</span></div>
-                    </div>
-                </div>
-                <div class="leaderboard-section">
-                    <h3>⚡ Longest Run (Global)</h3>
-                    <div id="time-leaderboard" class="loading">
-                        <div class="leaderboard-entry"><span>Loading global scores...</span><span>-</span></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Game Screen -->
-        <div id="game-screen" class="game-screen hidden">
-            <canvas id="gameCanvas" width="800" height="600"></canvas>
-            <div class="game-ui">
-                <div class="controls">Use Arrow Keys or WASD to move Yuki around!</div>
-                <div class="tip">Catch the phones, avoid obstacles, grab Red Bull for power!</div>
-                <div id="difficulty-display" class="difficulty-indicator">
-                    Difficulty: Normal
-                </div>
-            </div>
-        </div>
-
-        <!-- Game Over Screen -->
-        <div id="game-over-screen" class="game-over-screen hidden">
-            <h1>Game Over!</h1>
-            <p style="font-size: 1.5rem; margin-bottom: 2rem;">Yuki hit an obstacle! 💥</p>
-            <div class="stats">
-                <h3>Final Stats:</h3>
-                <p style="font-size: 1.2rem;">📱 Phones Caught: <span id="final-score" style="color: #ffd700; font-weight: bold;">0</span></p>
-                <p style="font-size: 1.2rem;">⏱️ Time Survived: <span id="final-time" style="color: #ffd700; font-weight: bold;">0s</span></p>
-                <p style="font-size: 1.1rem;">🎯 Difficulty Reached: <span id="final-difficulty" style="color: #ffd700; font-weight: bold;">Normal</span></p>
-                <div id="rank-display" style="margin-top: 1rem; display: none;">
-                    <p style="font-size: 1.1rem; color: #ffd700;">🏆 <span id="rank-text"></span></p>
-                </div>
-            </div>
-            
-            <div id="score-buttons">
-                <button class="green-btn" onclick="showNameInput()">Save to Global Leaderboard 🌍</button>
-                <button onclick="startGame()">Try Again! 🔄</button>
-                <button class="blue-btn" onclick="showMenu()">Main Menu</button>
-            </div>
-            
-            <div id="name-input-section" class="hidden">
-                <input type="text" id="player-name" class="name-input" placeholder="Enter your name" maxlength="20">
-                <br>
-                <button class="green-btn" onclick="submitScore()" id="submit-btn">Submit to Global Leaderboard! 🚀</button>
-                <button onclick="hideNameInput()">Cancel</button>
-            </div>
-            
-            <p style="font-size: 1.2rem; margin-top: 2rem; color: #ffd700;">
-                "Maybe I should've used a waterproof case!" - Yuki 📱💧
-            </p>
-        </div>
+    <h1>🔥 Firebase Connection Test</h1>
+    <div id="status" class="status info">🔄 Initializing Firebase...</div>
+    
+    <div class="test-results">
+        <h3>Test Results:</h3>
+        <div id="init-status">❓ Firebase Init: Pending</div>
+        <div id="read-status">❓ Firestore Read: Pending</div>
+        <div id="write-status">❓ Firestore Write: Pending</div>
+        <div id="listen-status">❓ Real-time Listen: Pending</div>
     </div>
 
-    <!-- Firebase SDK -->
+    <button onclick="testWrite()">Test Write Score</button>
+    <button onclick="testRead()">Test Read Scores</button>
+    <button onclick="clearConsole()">Clear Console</button>
+
+    <div id="console" style="background: black; padding: 15px; margin-top: 20px; border-radius: 5px; font-family: monospace; font-size: 12px; height: 300px; overflow-y: scroll;"></div>
+
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-        import { getFirestore, collection, addDoc, query, orderBy, limit, onSnapshot, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+        import { 
+            getFirestore, 
+            collection, 
+            addDoc, 
+            getDocs, 
+            query, 
+            orderBy, 
+            limit, 
+            onSnapshot, 
+            serverTimestamp 
+        } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+        // Console logging function
+        function log(message, type = 'info') {
+            const console = document.getElementById('console');
+            const time = new Date().toLocaleTimeString();
+            const colors = {
+                info: '#3498db',
+                success: '#27ae60',
+                error: '#e74c3c',
+                warning: '#f39c12'
+            };
+            console.innerHTML += `<div style="color: ${colors[type]};">[${time}] ${message}</div>`;
+            console.scrollTop = console.scrollHeight;
+            console.log(message);
+        }
 
         // Firebase configuration
         const firebaseConfig = {
@@ -306,710 +98,126 @@
             measurementId: "G-BEWXGM4DF4"
         };
 
+        let app, db;
+
         // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-
-        // Make Firebase functions globally available
-        window.db = db;
-        window.firebaseUtils = {
-            collection,
-            addDoc,
-            query,
-            orderBy,
-            limit,
-            onSnapshot,
-            serverTimestamp
-        };
-
-        // Firebase connection status
-        let firebaseConnected = false;
-        
-        // Test Firebase connection
         try {
-            const statusElement = document.getElementById('firebase-status');
+            log('🔄 Initializing Firebase...', 'info');
+            app = initializeApp(firebaseConfig);
+            db = getFirestore(app);
             
-            // Listen to leaderboards to test connection
-            const phonesQuery = query(collection(db, 'leaderboard-phones'), orderBy('score', 'desc'), limit(1));
-            onSnapshot(phonesQuery, (snapshot) => {
-                firebaseConnected = true;
-                statusElement.textContent = '🌍 Connected to global leaderboard!';
-                statusElement.classList.remove('error');
-            }, (error) => {
-                console.error('Firebase connection error:', error);
-                statusElement.textContent = '⚠️ Global leaderboard offline - scores will be local only';
-                statusElement.classList.add('error');
-            });
+            document.getElementById('init-status').innerHTML = '✅ Firebase Init: Success';
+            document.getElementById('status').innerHTML = '✅ Firebase initialized successfully!';
+            document.getElementById('status').className = 'status success';
+            log('✅ Firebase initialized successfully!', 'success');
+
+            // Test read immediately
+            testReadAutomatically();
             
         } catch (error) {
-            console.error('Firebase initialization error:', error);
-            document.getElementById('firebase-status').textContent = '⚠️ Global leaderboard offline';
-            document.getElementById('firebase-status').classList.add('error');
+            log('❌ Firebase initialization failed: ' + error.message, 'error');
+            document.getElementById('init-status').innerHTML = '❌ Firebase Init: Failed - ' + error.message;
+            document.getElementById('status').innerHTML = '❌ Firebase initialization failed: ' + error.message;
+            document.getElementById('status').className = 'status error';
         }
-    </script>
 
-    <script>
-        // Game variables
-        let gameState = 'menu';
-        let canvas, ctx;
-        let animationId;
-        let keys = {};
-        let globalLeaderboard = { mostPhones: [], bestTime: [] };
-        let firebaseConnected = false;
-        
-        const game = {
-            yuki: { x: 400, y: 500, width: 40, height: 62, speed: 5 },
-            phones: [],
-            obstacles: [],
-            powerUps: [],
-            particles: [],
-            score: 0,
-            gameRunning: false,
-            invincible: false,
-            invincibleTime: 0,
-            gameStartTime: 0,
-            lastPhoneSpawn: 0,
-            lastObstacleSpawn: 0,
-            lastPowerUpSpawn: 0,
-            screenShake: 0
-        };
-
-        // Initialize game
-        window.onload = function() {
-            canvas = document.getElementById('gameCanvas');
-            ctx = canvas.getContext('2d');
-            
-            // Set up Firebase listeners after a short delay
-            setTimeout(setupFirebaseListeners, 1000);
-        };
-
-        // Firebase functions
-        function setupFirebaseListeners() {
-            if (!window.db || !window.firebaseUtils) {
-                console.log('Firebase not ready, retrying...');
-                setTimeout(setupFirebaseListeners, 2000);
-                return;
-            }
-
+        // Test functions
+        async function testReadAutomatically() {
             try {
-                const { collection, query, orderBy, limit, onSnapshot } = window.firebaseUtils;
-
-                // Listen to phones leaderboard
-                const phonesQuery = query(
-                    collection(window.db, 'leaderboard-phones'), 
-                    orderBy('score', 'desc'), 
-                    limit(10)
-                );
+                log('🔄 Testing automatic read...', 'info');
+                const phonesRef = collection(db, 'leaderboard-phones');
+                const q = query(phonesRef, orderBy('score', 'desc'), limit(5));
                 
-                onSnapshot(phonesQuery, (snapshot) => {
-                    globalLeaderboard.mostPhones = [];
-                    snapshot.forEach((doc) => {
-                        globalLeaderboard.mostPhones.push(doc.data());
-                    });
-                    updateLeaderboardDisplay();
+                const querySnapshot = await getDocs(q);
+                document.getElementById('read-status').innerHTML = '✅ Firestore Read: Success (' + querySnapshot.size + ' docs)';
+                log('✅ Read test successful! Found ' + querySnapshot.size + ' documents', 'success');
+                
+                querySnapshot.forEach((doc) => {
+                    log('📄 Document: ' + JSON.stringify(doc.data()), 'info');
                 });
 
-                // Listen to time leaderboard
-                const timeQuery = query(
-                    collection(window.db, 'leaderboard-time'), 
-                    orderBy('time', 'asc'), 
-                    limit(10)
-                );
+                // Test real-time listener
+                testListener();
                 
-                onSnapshot(timeQuery, (snapshot) => {
-                    globalLeaderboard.bestTime = [];
-                    snapshot.forEach((doc) => {
-                        globalLeaderboard.bestTime.push(doc.data());
-                    });
-                    updateLeaderboardDisplay();
-                });
+            } catch (error) {
+                log('❌ Read test failed: ' + error.message, 'error');
+                document.getElementById('read-status').innerHTML = '❌ Firestore Read: Failed - ' + error.message;
+                
+                // Log more details
+                log('Error code: ' + error.code, 'error');
+                log('Error details: ' + JSON.stringify(error), 'error');
+            }
+        }
 
-                firebaseConnected = true;
-                console.log('Firebase listeners set up successfully');
+        async function testListener() {
+            try {
+                log('🔄 Testing real-time listener...', 'info');
+                const phonesRef = collection(db, 'leaderboard-phones');
+                const q = query(phonesRef, orderBy('score', 'desc'), limit(3));
+                
+                const unsubscribe = onSnapshot(q, (snapshot) => {
+                    document.getElementById('listen-status').innerHTML = '✅ Real-time Listen: Success';
+                    log('✅ Real-time listener working! Received ' + snapshot.size + ' docs', 'success');
+                    
+                    snapshot.docChanges().forEach((change) => {
+                        if (change.type === 'added') {
+                            log('📢 New document added: ' + JSON.stringify(change.doc.data()), 'success');
+                        }
+                    });
+                }, (error) => {
+                    document.getElementById('listen-status').innerHTML = '❌ Real-time Listen: Failed - ' + error.message;
+                    log('❌ Real-time listener failed: ' + error.message, 'error');
+                });
 
             } catch (error) {
-                console.error('Error setting up Firebase listeners:', error);
+                log('❌ Listener setup failed: ' + error.message, 'error');
+                document.getElementById('listen-status').innerHTML = '❌ Real-time Listen: Setup Failed';
             }
         }
 
-        async function submitScoreToFirebase(playerName, score, time) {
-            if (!window.db || !window.firebaseUtils) {
-                console.error('Firebase not available');
-                return false;
-            }
-
+        // Make functions globally available
+        window.testWrite = async function() {
             try {
-                const { collection, addDoc, serverTimestamp } = window.firebaseUtils;
-                
-                const scoreData = {
-                    name: playerName,
-                    score: score,
-                    time: time,
+                log('🔄 Testing write operation...', 'info');
+                const testData = {
+                    name: 'Test Player ' + Math.floor(Math.random() * 1000),
+                    score: Math.floor(Math.random() * 50) + 1,
+                    time: Math.floor(Math.random() * 120) + 10,
                     timestamp: serverTimestamp(),
-                    date: new Date().toISOString().split('T')[0] // YYYY-MM-DD format
+                    date: new Date().toISOString().split('T')[0]
                 };
 
-                // Submit to phones leaderboard if score > 0
-                if (score > 0) {
-                    await addDoc(collection(window.db, 'leaderboard-phones'), scoreData);
-                    console.log('Score submitted to phones leaderboard');
-                }
+                const docRef = await addDoc(collection(db, 'leaderboard-phones'), testData);
+                document.getElementById('write-status').innerHTML = '✅ Firestore Write: Success';
+                log('✅ Write test successful! Document ID: ' + docRef.id, 'success');
+                log('📝 Data written: ' + JSON.stringify(testData, null, 2), 'info');
 
-                // Submit to time leaderboard if score > 0 (only successful runs)
-                if (score > 0) {
-                    await addDoc(collection(window.db, 'leaderboard-time'), scoreData);
-                    console.log('Time submitted to time leaderboard');
-                }
-
-                return true;
             } catch (error) {
-                console.error('Error submitting score:', error);
-                return false;
+                log('❌ Write test failed: ' + error.message, 'error');
+                document.getElementById('write-status').innerHTML = '❌ Firestore Write: Failed - ' + error.message;
+                log('Error code: ' + error.code, 'error');
             }
-        }
+        };
 
-        // Input handling
-        document.addEventListener('keydown', (e) => {
-            keys[e.key.toLowerCase()] = true;
-        });
-
-        document.addEventListener('keyup', (e) => {
-            keys[e.key.toLowerCase()] = false;
-        });
-
-        // Screen management
-        function showScreen(screenId) {
-            document.querySelectorAll('.menu-screen, .game-screen, .game-over-screen').forEach(s => s.classList.add('hidden'));
-            document.getElementById(screenId).classList.remove('hidden');
-        }
-
-        function showMenu() {
-            gameState = 'menu';
-            showScreen('menu-screen');
-        }
-
-        function showNameInput() {
-            document.getElementById('score-buttons').classList.add('hidden');
-            document.getElementById('name-input-section').classList.remove('hidden');
-        }
-
-        function hideNameInput() {
-            document.getElementById('score-buttons').classList.remove('hidden');
-            document.getElementById('name-input-section').classList.add('hidden');
-        }
-
-        // Difficulty management
-        function getDifficultyInfo(gameTimeSeconds) {
-            if (gameTimeSeconds >= 90) {
-                return { name: "INSANE", color: "#ff0000" };
-            } else if (gameTimeSeconds >= 60) {
-                return { name: "HARD", color: "#ff6600" };
-            } else if (gameTimeSeconds >= 30) {
-                return { name: "MEDIUM", color: "#ffaa00" };
-            }
-            return { name: "NORMAL", color: "#00ff00" };
-        }
-
-        function updateDifficultyDisplay(gameTimeSeconds) {
-            const difficultyInfo = getDifficultyInfo(gameTimeSeconds);
-            const display = document.getElementById('difficulty-display');
-            if (display) {
-                display.textContent = `Difficulty: ${difficultyInfo.name}`;
-                display.style.backgroundColor = difficultyInfo.color + '80';
-            }
-        }
-
-        // Game functions
-        function createParticles(x, y, color, count = 8) {
-            const particles = [];
-            for (let i = 0; i < count; i++) {
-                particles.push({
-                    x: x,
-                    y: y,
-                    vx: (Math.random() - 0.5) * 10,
-                    vy: (Math.random() - 0.5) * 10,
-                    color: color,
-                    life: 30,
-                    maxLife: 30
-                });
-            }
-            return particles;
-        }
-
-        function startGame() {
-            // Reset game state
-            game.yuki = { x: 400, y: 500, width: 40, height: 62, speed: 5 };
-            game.phones = [];
-            game.obstacles = [];
-            game.powerUps = [];
-            game.particles = [];
-            game.score = 0;
-            game.gameRunning = true;
-            game.invincible = false;
-            game.invincibleTime = 0;
-            game.gameStartTime = Date.now();
-            game.lastPhoneSpawn = 0;
-            game.lastObstacleSpawn = 0;
-            game.lastPowerUpSpawn = 0;
-            game.screenShake = 0;
-            
-            gameState = 'playing';
-            showScreen('game-screen');
-            gameLoop();
-        }
-
-        function gameLoop() {
-            if (!game.gameRunning) return;
-            
-            updateGame();
-            drawGame();
-            animationId = requestAnimationFrame(gameLoop);
-        }
-
-        function updateGame() {
-            const currentTime = Date.now();
-            const gameTimeSeconds = (currentTime - game.gameStartTime) / 1000;
-            
-            updateDifficultyDisplay(gameTimeSeconds);
-            
-            if (game.invincible) {
-                game.invincibleTime -= 16;
-                if (game.invincibleTime <= 0) {
-                    game.invincible = false;
-                }
-            }
-
-            if (game.screenShake > 0) {
-                game.screenShake--;
-            }
-
-            // Move Yuki
-            const speed = game.invincible ? game.yuki.speed * 1.5 : game.yuki.speed;
-            if (keys['arrowleft'] || keys['a']) {
-                game.yuki.x = Math.max(0, game.yuki.x - speed);
-            }
-            if (keys['arrowright'] || keys['d']) {
-                game.yuki.x = Math.min(760, game.yuki.x + speed);
-            }
-            if (keys['arrowup'] || keys['w']) {
-                game.yuki.y = Math.max(0, game.yuki.y - speed);
-            }
-            if (keys['arrowdown'] || keys['s']) {
-                game.yuki.y = Math.min(538, game.yuki.y + speed);
-            }
-
-            spawnPhone(currentTime);
-            spawnObstacle(currentTime);
-            spawnPowerUp(currentTime);
-
-            game.phones.forEach(phone => phone.y += phone.speed);
-            game.obstacles.forEach(obstacle => obstacle.y += obstacle.speed);
-            game.powerUps.forEach(powerUp => powerUp.y += powerUp.speed);
-
-            game.particles = game.particles.filter(particle => {
-                particle.x += particle.vx;
-                particle.y += particle.vy;
-                particle.vx *= 0.98;
-                particle.vy *= 0.98;
-                particle.life--;
-                return particle.life > 0;
-            });
-
-            checkCollisions();
-        }
-
-        function spawnPhone(currentTime) {
-            if (currentTime - game.lastPhoneSpawn > 2000) {
-                const numPhones = Math.min(3, Math.floor(currentTime / 10000) + 1);
-                for (let i = 0; i < numPhones; i++) {
-                    game.phones.push({
-                        x: Math.random() * 760 + 20,
-                        y: -30,
-                        width: 25,
-                        height: 35,
-                        speed: 2 + Math.random() * 2
-                    });
-                }
-                game.lastPhoneSpawn = currentTime;
-            }
-        }
-
-        function spawnObstacle(currentTime) {
-            const gameTimeSeconds = (currentTime - game.gameStartTime) / 1000;
-            let spawnInterval = 1500;
-            let speedMultiplier = 1;
-            
-            if (gameTimeSeconds >= 90) {
-                spawnInterval = 600;
-                speedMultiplier = 1.8;
-            } else if (gameTimeSeconds >= 60) {
-                spawnInterval = 900;
-                speedMultiplier = 1.5;
-            } else if (gameTimeSeconds >= 30) {
-                spawnInterval = 1200;
-                speedMultiplier = 1.2;
-            }
-            
-            if (currentTime - game.lastObstacleSpawn > spawnInterval) {
-                const obstacleTypes = ['fish', 'rock', 'debris'];
-                const type = obstacleTypes[Math.floor(Math.random() * obstacleTypes.length)];
-                game.obstacles.push({
-                    x: Math.random() * 760 + 20,
-                    y: -30,
-                    width: 30 + Math.random() * 20,
-                    height: 30 + Math.random() * 20,
-                    speed: (1.5 + Math.random() * 1.5) * speedMultiplier,
-                    type: type
-                });
-                game.lastObstacleSpawn = currentTime;
-            }
-        }
-
-        function spawnPowerUp(currentTime) {
-            if (currentTime - game.lastPowerUpSpawn > 8000) {
-                game.powerUps.push({
-                    x: Math.random() * 760 + 20,
-                    y: -30,
-                    width: 25,
-                    height: 30,
-                    speed: 1.5
-                });
-                game.lastPowerUpSpawn = currentTime;
-            }
-        }
-
-        function checkCollisions() {
-            game.phones = game.phones.filter(phone => {
-                if (phone.x < game.yuki.x + game.yuki.width &&
-                    phone.x + phone.width > game.yuki.x &&
-                    phone.y < game.yuki.y + game.yuki.height &&
-                    phone.y + phone.height > game.yuki.y) {
-                    game.score++;
-                    game.particles.push(...createParticles(phone.x + phone.width/2, phone.y + phone.height/2, '#00ff00', 12));
-                    return false;
-                }
-                return phone.y < 600;
-            });
-
-            game.powerUps = game.powerUps.filter(powerUp => {
-                if (powerUp.x < game.yuki.x + game.yuki.width &&
-                    powerUp.x + powerUp.width > game.yuki.x &&
-                    powerUp.y < game.yuki.y + game.yuki.height &&
-                    powerUp.y + powerUp.height > game.yuki.y) {
-                    game.invincible = true;
-                    game.invincibleTime = 10000;
-                    game.particles.push(...createParticles(powerUp.x + powerUp.width/2, powerUp.y + powerUp.height/2, '#ff0000', 15));
-                    return false;
-                }
-                return powerUp.y < 600;
-            });
-
-            if (!game.invincible) {
-                for (let obstacle of game.obstacles) {
-                    if (obstacle.x < game.yuki.x + game.yuki.width &&
-                        obstacle.x + obstacle.width > game.yuki.x &&
-                        obstacle.y < game.yuki.y + game.yuki.height &&
-                        obstacle.y + obstacle.height > game.yuki.y) {
-                        endGame();
-                        return;
-                    }
-                }
-            }
-
-            game.obstacles = game.obstacles.filter(obstacle => obstacle.y < 600);
-        }
-
-        function endGame() {
-            game.gameRunning = false;
-            game.screenShake = 20;
-            cancelAnimationFrame(animationId);
-            
-            const finalTime = Math.floor((Date.now() - game.gameStartTime) / 1000);
-            const difficultyInfo = getDifficultyInfo(finalTime);
-            
-            document.getElementById('final-score').textContent = game.score;
-            document.getElementById('final-time').textContent = finalTime + 's';
-            document.getElementById('final-difficulty').textContent = difficultyInfo.name;
-            
-            // Show rank information
-            showRankInfo(game.score, finalTime);
-            
-            gameState = 'gameOver';
-            showScreen('game-over-screen');
-        }
-
-        function showRankInfo(score, time) {
-            const rankDisplay = document.getElementById('rank-display');
-            const rankText = document.getElementById('rank-text');
-            
-            // Calculate rank for phones
-            let phoneRank = 1;
-            for (let entry of globalLeaderboard.mostPhones) {
-                if (entry.score > score) phoneRank++;
-            }
-            
-            // Calculate rank for time (only if score > 0)
-            let timeRank = 1;
-            if (score > 0) {
-                for (let entry of globalLeaderboard.bestTime) {
-                    if (entry.time < time) timeRank++;
-                }
-            }
-            
-            if (score > 0) {
-                if (phoneRank === 1) {
-                    rankText.textContent = "NEW WORLD RECORD! 🥇";
-                } else if (phoneRank <= 3) {
-                    rankText.textContent = `${phoneRank === 2 ? '🥈' : '🥉'} #${phoneRank} on Global Leaderboard!`;
-                } else if (phoneRank <= 10) {
-                    rankText.textContent = `Top 10 Global! Ranked #${phoneRank}`;
-                } else {
-                    rankText.textContent = `Global Rank: #${phoneRank}`;
-                }
-                rankDisplay.style.display = 'block';
-            } else {
-                rankDisplay.style.display = 'none';
-            }
-        }
-
-        function drawGame() {
-            ctx.clearRect(0, 0, 800, 600);
-
-            if (game.screenShake > 0) {
-                ctx.save();
-                ctx.translate(
-                    (Math.random() - 0.5) * game.screenShake,
-                    (Math.random() - 0.5) * game.screenShake
-                );
-            }
-
-            // Background
-            const gradient = ctx.createLinearGradient(0, 0, 0, 600);
-            gradient.addColorStop(0, '#4a90e2');
-            gradient.addColorStop(1, '#1e3a5f');
-            ctx.fillStyle = gradient;
-            ctx.fillRect(0, 0, 800, 600);
-
-            // Bubbles
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
-            for (let i = 0; i < 20; i++) {
-                const x = (Date.now() / 50 + i * 40) % 800;
-                const y = (Date.now() / 30 + i * 30) % 600;
-                ctx.beginPath();
-                ctx.arc(x, y, 3 + Math.sin(Date.now() / 1000 + i) * 2, 0, Math.PI * 2);
-                ctx.fill();
-            }
-
-            // Draw Yuki
-            const yukiX = game.yuki.x;
-            const yukiY = game.yuki.y;
-            
-            if (game.invincible) {
-                ctx.shadowColor = '#ff0000';
-                ctx.shadowBlur = 15;
-            }
-
-            // Helmet
-            ctx.fillStyle = '#1a1a1a';
-            ctx.beginPath();
-            ctx.arc(yukiX + 20, yukiY + 10, 12, 0, Math.PI * 2);
-            ctx.fill();
-            
-            // Helmet visor
-            ctx.fillStyle = '#4a90e2';
-            ctx.beginPath();
-            ctx.arc(yukiX + 20, yukiY + 10, 8, 0, Math.PI * 2);
-            ctx.fill();
-
-            // Head/neck
-            ctx.fillStyle = '#fdbcb4';
-            ctx.fillRect(yukiX + 16, yukiY + 20, 8, 6);
-
-            // Body (Red Bull swimsuit)
-            ctx.fillStyle = game.invincible ? '#ff6b6b' : '#e74c3c';
-            ctx.fillRect(yukiX + 12, yukiY + 26, 16, 20);
-            
-            // Red Bull logo on chest
-            ctx.fillStyle = '#ffd700';
-            ctx.font = 'bold 8px Arial';
-            ctx.fillText('RB', yukiX + 17, yukiY + 36);
-
-            // Arms
-            ctx.fillStyle = game.invincible ? '#ff6b6b' : '#e74c3c';
-            ctx.fillRect(yukiX + 6, yukiY + 28, 6, 12);
-            ctx.fillRect(yukiX + 28, yukiY + 28, 6, 12);
-            
-            // Hands
-            ctx.fillStyle = '#fdbcb4';
-            ctx.beginPath();
-            ctx.arc(yukiX + 9, yukiY + 42, 3, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.beginPath();
-            ctx.arc(yukiX + 31, yukiY + 42, 3, 0, Math.PI * 2);
-            ctx.fill();
-
-            // Legs
-            ctx.fillStyle = game.invincible ? '#ff6b6b' : '#e74c3c';
-            ctx.fillRect(yukiX + 14, yukiY + 46, 5, 12);
-            ctx.fillRect(yukiX + 21, yukiY + 46, 5, 12);
-            
-            // Fins/feet
-            ctx.fillStyle = '#2c3e50';
-            ctx.fillRect(yukiX + 12, yukiY + 58, 8, 4);
-            ctx.fillRect(yukiX + 20, yukiY + 58, 8, 4);
-            
-            ctx.shadowBlur = 0;
-
-            // Draw phones
-            ctx.fillStyle = '#2c3e50';
-            game.phones.forEach(phone => {
-                ctx.fillRect(phone.x, phone.y, phone.width, phone.height);
-                ctx.fillStyle = '#3498db';
-                ctx.fillRect(phone.x + 2, phone.y + 2, phone.width - 4, phone.height - 8);
-                ctx.fillStyle = '#2c3e50';
-            });
-
-            // Draw obstacles
-            game.obstacles.forEach(obstacle => {
-                if (obstacle.type === 'fish') {
-                    ctx.fillStyle = '#f39c12';
-                    ctx.beginPath();
-                    ctx.ellipse(obstacle.x + obstacle.width/2, obstacle.y + obstacle.height/2, 
-                               obstacle.width/2, obstacle.height/3, 0, 0, Math.PI * 2);
-                    ctx.fill();
-                } else if (obstacle.type === 'rock') {
-                    ctx.fillStyle = '#7f8c8d';
-                    ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
-                } else {
-                    ctx.fillStyle = '#8b4513';
-                    ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
-                }
-            });
-
-            // Draw Red Bull power-ups
-            ctx.fillStyle = '#ff0000';
-            game.powerUps.forEach(powerUp => {
-                ctx.fillRect(powerUp.x, powerUp.y, powerUp.width, powerUp.height);
-                ctx.fillStyle = '#ffffff';
-                ctx.font = '10px Arial';
-                ctx.fillText('RB', powerUp.x + 7, powerUp.y + 18);
-                ctx.fillStyle = '#ff0000';
-            });
-
-            // Draw particles
-            game.particles.forEach(particle => {
-                const alpha = particle.life / particle.maxLife;
-                ctx.fillStyle = particle.color + Math.floor(alpha * 255).toString(16).padStart(2, '0');
-                ctx.fillRect(particle.x - 2, particle.y - 2, 4, 4);
-            });
-
-            if (game.screenShake > 0) {
-                ctx.restore();
-            }
-
-            // Draw UI
-            ctx.fillStyle = 'white';
-            ctx.font = 'bold 20px Arial';
-            ctx.fillText(`Phones: ${game.score}`, 20, 40);
-            ctx.fillText(`Time: ${Math.floor((Date.now() - game.gameStartTime) / 1000)}s`, 20, 70);
-            
-            if (game.invincible) {
-                ctx.fillStyle = '#ff6b6b';
-                ctx.fillText(`Red Bull Power: ${Math.ceil(game.invincibleTime / 1000)}s`, 20, 100);
-            }
-        }
-
-        async function submitScore() {
-            const finalTime = Math.floor((Date.now() - game.gameStartTime) / 1000);
-            const playerName = document.getElementById('player-name').value.trim() || 'Anonymous';
-            const submitBtn = document.getElementById('submit-btn');
-            
-            // Disable button and show loading
-            submitBtn.disabled = true;
-            submitBtn.textContent = 'Submitting...';
-            
+        window.testRead = async function() {
             try {
-                // Try to submit to Firebase first
-                const success = await submitScoreToFirebase(playerName, game.score, finalTime);
+                log('🔄 Manual read test...', 'info');
+                const querySnapshot = await getDocs(collection(db, 'leaderboard-phones'));
+                log('✅ Manual read successful! Found ' + querySnapshot.size + ' documents', 'success');
                 
-                if (success) {
-                    submitBtn.textContent = 'Submitted! 🎉';
-                    setTimeout(() => {
-                        hideNameInput();
-                        showMenu();
-                    }, 1500);
-                } else {
-                    throw new Error('Firebase submission failed');
-                }
+                querySnapshot.forEach((doc) => {
+                    log('📄 ' + doc.id + ' => ' + JSON.stringify(doc.data()), 'info');
+                });
+
             } catch (error) {
-                console.error('Error submitting score:', error);
-                
-                // Fallback to local storage
-                const localLeaderboard = JSON.parse(localStorage.getItem('yukiPhoneCatchLocal') || '{"mostPhones":[],"bestTime":[]}');
-                
-                const newEntry = {
-                    name: playerName,
-                    score: game.score,
-                    time: finalTime,
-                    date: new Date().toLocaleDateString()
-                };
-
-                localLeaderboard.mostPhones.push(newEntry);
-                localLeaderboard.mostPhones.sort((a, b) => b.score - a.score);
-                localLeaderboard.mostPhones = localLeaderboard.mostPhones.slice(0, 10);
-
-                if (game.score > 0) {
-                    localLeaderboard.bestTime.push(newEntry);
-                    localLeaderboard.bestTime.sort((a, b) => a.time - b.time);
-                    localLeaderboard.bestTime = localLeaderboard.bestTime.slice(0, 10);
-                }
-
-                localStorage.setItem('yukiPhoneCatchLocal', JSON.stringify(localLeaderboard));
-                
-                submitBtn.textContent = 'Saved Locally (Network Error)';
-                setTimeout(() => {
-                    hideNameInput();
-                    showMenu();
-                }, 2000);
+                log('❌ Manual read failed: ' + error.message, 'error');
             }
-        }
+        };
 
-        function updateLeaderboardDisplay() {
-            const phonesDiv = document.getElementById('phones-leaderboard');
-            const timeDiv = document.getElementById('time-leaderboard');
-            
-            // Remove loading class
-            phonesDiv.classList.remove('loading');
-            timeDiv.classList.remove('loading');
-            
-            // Update phones leaderboard
-            if (globalLeaderboard.mostPhones.length > 0) {
-                phonesDiv.innerHTML = globalLeaderboard.mostPhones.slice(0, 8).map((entry, index) => {
-                    const rank = index + 1;
-                    const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : `#${rank}`;
-                    return `<div class="leaderboard-entry">
-                        <span>${medal} ${entry.name}</span>
-                        <span>${entry.score} phones</span>
-                    </div>`;
-                }).join('');
-            } else {
-                phonesDiv.innerHTML = '<div class="leaderboard-entry"><span>No global scores yet!</span><span>-</span></div>';
-            }
+        window.clearConsole = function() {
+            document.getElementById('console').innerHTML = '';
+        };
 
-            // Update time leaderboard
-            if (globalLeaderboard.bestTime.length > 0) {
-                timeDiv.innerHTML = globalLeaderboard.bestTime.slice(0, 8).map((entry, index) => {
-                    const rank = index + 1;
-                    const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : `#${rank}`;
-                    return `<div class="leaderboard-entry">
-                        <span>${medal} ${entry.name}</span>
-                        <span>${entry.time}s</span>
-                    </div>`;
-                }).join('');
-            } else {
-                timeDiv.innerHTML = '<div class="leaderboard-entry"><span>No global times yet!</span><span>-</span></div>';
-            }
-        }
     </script>
 </body>
 </html>
