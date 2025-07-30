@@ -1,4 +1,4 @@
-    <parameter name="title">Yuki's Phone Catch<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -29,7 +29,7 @@
         
         .menu-screen, .game-over-screen {
             text-align: center;
-            max-width: 800px;
+            max-width: 900px;
         }
         
         .game-screen {
@@ -98,15 +98,6 @@
             background: #2980b9;
         }
         
-        .yellow-btn {
-            background: #f39c12;
-            color: black;
-        }
-        
-        .yellow-btn:hover {
-            background: #e67e22;
-        }
-        
         canvas {
             border: 4px solid #ffd700;
             border-radius: 10px;
@@ -130,7 +121,7 @@
             grid-template-columns: 1fr 1fr;
             gap: 2rem;
             margin-top: 2rem;
-            max-width: 600px;
+            max-width: 700px;
         }
         
         .leaderboard-section {
@@ -148,6 +139,14 @@
             display: flex;
             justify-content: space-between;
             margin-bottom: 0.5rem;
+            padding: 0.25rem 0;
+        }
+        
+        .leaderboard-entry.highlight {
+            background: rgba(255, 215, 0, 0.2);
+            border-radius: 4px;
+            padding: 0.5rem;
+            margin: 0.25rem -0.5rem;
         }
         
         .name-input {
@@ -170,6 +169,22 @@
             border-radius: 5px;
             margin: 0.5rem 0;
             font-weight: bold;
+        }
+        
+        .firebase-status {
+            background: rgba(46, 204, 113, 0.8);
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            margin: 1rem 0;
+            font-size: 0.9rem;
+        }
+        
+        .firebase-status.error {
+            background: rgba(231, 76, 60, 0.8);
+        }
+        
+        .loading {
+            opacity: 0.7;
         }
         
         @media (max-width: 768px) {
@@ -195,10 +210,13 @@
         <div id="menu-screen" class="menu-screen">
             <h1>🏎️ Yuki's Phone Catch</h1>
             <h2>Lake Como Rescue Mission</h2>
+            <div class="firebase-status" id="firebase-status">
+                🔄 Connecting to global leaderboard...
+            </div>
             <div class="instructions">
                 <p style="font-size: 1.2rem; margin-bottom: 1.5rem;">
-                    Help Yuki Tsunoda dive underwater to catch his phones before getting hit by all the underwater obstacles! 
-                    Navigate around obstacles, collect Red Bull power-ups for invincibility, and see how many phones you can save!
+                    Help Yuki Tsunoda dive underwater to catch his phones before they sink to the bottom of Lake Como! 
+                    Navigate around obstacles, collect Red Bull power-ups for invincibility, and compete globally!
                 </p>
                 <div class="controls">
                     <strong>Controls:</strong> Arrow Keys or WASD to move Yuki underwater
@@ -209,14 +227,20 @@
                 </div>
             </div>
             <button onclick="startGame()">Start Diving! 🤿</button>
-            <div id="leaderboard-display" class="leaderboard hidden">
+            
+            <!-- Global Leaderboard -->
+            <div class="leaderboard">
                 <div class="leaderboard-section">
-                    <h3>📱 Most Phones Caught</h3>
-                    <div id="phones-leaderboard"></div>
+                    <h3>📱 Most Phones Caught (Global)</h3>
+                    <div id="phones-leaderboard" class="loading">
+                        <div class="leaderboard-entry"><span>Loading global scores...</span><span>-</span></div>
+                    </div>
                 </div>
                 <div class="leaderboard-section">
-                    <h3>⚡ Longest Run</h3>
-                    <div id="time-leaderboard"></div>
+                    <h3>⚡ Longest Run (Global)</h3>
+                    <div id="time-leaderboard" class="loading">
+                        <div class="leaderboard-entry"><span>Loading global scores...</span><span>-</span></div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -226,7 +250,7 @@
             <canvas id="gameCanvas" width="800" height="600"></canvas>
             <div class="game-ui">
                 <div class="controls">Use Arrow Keys or WASD to move Yuki around!</div>
-                <div class="tip">Catch the phones, avoid obstacles, grab Red Bull for invincibility!</div>
+                <div class="tip">Catch the phones, avoid obstacles, grab Red Bull for power!</div>
                 <div id="difficulty-display" class="difficulty-indicator">
                     Difficulty: Normal
                 </div>
@@ -242,10 +266,13 @@
                 <p style="font-size: 1.2rem;">📱 Phones Caught: <span id="final-score" style="color: #ffd700; font-weight: bold;">0</span></p>
                 <p style="font-size: 1.2rem;">⏱️ Time Survived: <span id="final-time" style="color: #ffd700; font-weight: bold;">0s</span></p>
                 <p style="font-size: 1.1rem;">🎯 Difficulty Reached: <span id="final-difficulty" style="color: #ffd700; font-weight: bold;">Normal</span></p>
+                <div id="rank-display" style="margin-top: 1rem; display: none;">
+                    <p style="font-size: 1.1rem; color: #ffd700;">🏆 <span id="rank-text"></span></p>
+                </div>
             </div>
             
             <div id="score-buttons">
-                <button class="green-btn" onclick="showNameInput()">Save to Leaderboard 🏆</button>
+                <button class="green-btn" onclick="showNameInput()">Save to Global Leaderboard 🌍</button>
                 <button onclick="startGame()">Try Again! 🔄</button>
                 <button class="blue-btn" onclick="showMenu()">Main Menu</button>
             </div>
@@ -253,7 +280,7 @@
             <div id="name-input-section" class="hidden">
                 <input type="text" id="player-name" class="name-input" placeholder="Enter your name" maxlength="20">
                 <br>
-                <button class="green-btn" onclick="submitScore()">Submit Score! 🚀</button>
+                <button class="green-btn" onclick="submitScore()" id="submit-btn">Submit to Global Leaderboard! 🚀</button>
                 <button onclick="hideNameInput()">Cancel</button>
             </div>
             
@@ -263,13 +290,72 @@
         </div>
     </div>
 
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getFirestore, collection, addDoc, query, orderBy, limit, onSnapshot, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyCyk9ntpLpV_ahTSOEybDnOI9hJaQVDPN0",
+            authDomain: "yuki-phone-catch.firebaseapp.com",
+            projectId: "yuki-phone-catch",
+            storageBucket: "yuki-phone-catch.firebasestorage.app",
+            messagingSenderId: "207922666559",
+            appId: "1:207922666559:web:8fd27c1832fa7329ef6c8a",
+            measurementId: "G-BEWXGM4DF4"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // Make Firebase functions globally available
+        window.db = db;
+        window.firebaseUtils = {
+            collection,
+            addDoc,
+            query,
+            orderBy,
+            limit,
+            onSnapshot,
+            serverTimestamp
+        };
+
+        // Firebase connection status
+        let firebaseConnected = false;
+        
+        // Test Firebase connection
+        try {
+            const statusElement = document.getElementById('firebase-status');
+            
+            // Listen to leaderboards to test connection
+            const phonesQuery = query(collection(db, 'leaderboard-phones'), orderBy('score', 'desc'), limit(1));
+            onSnapshot(phonesQuery, (snapshot) => {
+                firebaseConnected = true;
+                statusElement.textContent = '🌍 Connected to global leaderboard!';
+                statusElement.classList.remove('error');
+            }, (error) => {
+                console.error('Firebase connection error:', error);
+                statusElement.textContent = '⚠️ Global leaderboard offline - scores will be local only';
+                statusElement.classList.add('error');
+            });
+            
+        } catch (error) {
+            console.error('Firebase initialization error:', error);
+            document.getElementById('firebase-status').textContent = '⚠️ Global leaderboard offline';
+            document.getElementById('firebase-status').classList.add('error');
+        }
+    </script>
+
     <script>
         // Game variables
         let gameState = 'menu';
         let canvas, ctx;
         let animationId;
         let keys = {};
-        let leaderboard = { mostPhones: [], bestTime: [] };
+        let globalLeaderboard = { mostPhones: [], bestTime: [] };
+        let firebaseConnected = false;
         
         const game = {
             yuki: { x: 400, y: 500, width: 40, height: 62, speed: 5 },
@@ -293,13 +379,94 @@
             canvas = document.getElementById('gameCanvas');
             ctx = canvas.getContext('2d');
             
-            // Load leaderboard from localStorage
-            const saved = localStorage.getItem('yukiPhoneCatchLeaderboard');
-            if (saved) {
-                leaderboard = JSON.parse(saved);
-                updateLeaderboardDisplay();
-            }
+            // Set up Firebase listeners after a short delay
+            setTimeout(setupFirebaseListeners, 1000);
         };
+
+        // Firebase functions
+        function setupFirebaseListeners() {
+            if (!window.db || !window.firebaseUtils) {
+                console.log('Firebase not ready, retrying...');
+                setTimeout(setupFirebaseListeners, 2000);
+                return;
+            }
+
+            try {
+                const { collection, query, orderBy, limit, onSnapshot } = window.firebaseUtils;
+
+                // Listen to phones leaderboard
+                const phonesQuery = query(
+                    collection(window.db, 'leaderboard-phones'), 
+                    orderBy('score', 'desc'), 
+                    limit(10)
+                );
+                
+                onSnapshot(phonesQuery, (snapshot) => {
+                    globalLeaderboard.mostPhones = [];
+                    snapshot.forEach((doc) => {
+                        globalLeaderboard.mostPhones.push(doc.data());
+                    });
+                    updateLeaderboardDisplay();
+                });
+
+                // Listen to time leaderboard
+                const timeQuery = query(
+                    collection(window.db, 'leaderboard-time'), 
+                    orderBy('time', 'asc'), 
+                    limit(10)
+                );
+                
+                onSnapshot(timeQuery, (snapshot) => {
+                    globalLeaderboard.bestTime = [];
+                    snapshot.forEach((doc) => {
+                        globalLeaderboard.bestTime.push(doc.data());
+                    });
+                    updateLeaderboardDisplay();
+                });
+
+                firebaseConnected = true;
+                console.log('Firebase listeners set up successfully');
+
+            } catch (error) {
+                console.error('Error setting up Firebase listeners:', error);
+            }
+        }
+
+        async function submitScoreToFirebase(playerName, score, time) {
+            if (!window.db || !window.firebaseUtils) {
+                console.error('Firebase not available');
+                return false;
+            }
+
+            try {
+                const { collection, addDoc, serverTimestamp } = window.firebaseUtils;
+                
+                const scoreData = {
+                    name: playerName,
+                    score: score,
+                    time: time,
+                    timestamp: serverTimestamp(),
+                    date: new Date().toISOString().split('T')[0] // YYYY-MM-DD format
+                };
+
+                // Submit to phones leaderboard if score > 0
+                if (score > 0) {
+                    await addDoc(collection(window.db, 'leaderboard-phones'), scoreData);
+                    console.log('Score submitted to phones leaderboard');
+                }
+
+                // Submit to time leaderboard if score > 0 (only successful runs)
+                if (score > 0) {
+                    await addDoc(collection(window.db, 'leaderboard-time'), scoreData);
+                    console.log('Time submitted to time leaderboard');
+                }
+
+                return true;
+            } catch (error) {
+                console.error('Error submitting score:', error);
+                return false;
+            }
+        }
 
         // Input handling
         document.addEventListener('keydown', (e) => {
@@ -319,7 +486,6 @@
         function showMenu() {
             gameState = 'menu';
             showScreen('menu-screen');
-            updateLeaderboardDisplay();
         }
 
         function showNameInput() {
@@ -349,7 +515,7 @@
             const display = document.getElementById('difficulty-display');
             if (display) {
                 display.textContent = `Difficulty: ${difficultyInfo.name}`;
-                display.style.backgroundColor = difficultyInfo.color + '80'; // Add transparency
+                display.style.backgroundColor = difficultyInfo.color + '80';
             }
         }
 
@@ -404,10 +570,8 @@
             const currentTime = Date.now();
             const gameTimeSeconds = (currentTime - game.gameStartTime) / 1000;
             
-            // Update difficulty display
             updateDifficultyDisplay(gameTimeSeconds);
             
-            // Update invincibility
             if (game.invincible) {
                 game.invincibleTime -= 16;
                 if (game.invincibleTime <= 0) {
@@ -415,7 +579,6 @@
                 }
             }
 
-            // Update screen shake
             if (game.screenShake > 0) {
                 game.screenShake--;
             }
@@ -435,17 +598,14 @@
                 game.yuki.y = Math.min(538, game.yuki.y + speed);
             }
 
-            // Spawn entities
             spawnPhone(currentTime);
             spawnObstacle(currentTime);
             spawnPowerUp(currentTime);
 
-            // Move entities
             game.phones.forEach(phone => phone.y += phone.speed);
             game.obstacles.forEach(obstacle => obstacle.y += obstacle.speed);
             game.powerUps.forEach(powerUp => powerUp.y += powerUp.speed);
 
-            // Update particles
             game.particles = game.particles.filter(particle => {
                 particle.x += particle.vx;
                 particle.y += particle.vy;
@@ -475,20 +635,18 @@
         }
 
         function spawnObstacle(currentTime) {
-            // Progressive difficulty based on game time
             const gameTimeSeconds = (currentTime - game.gameStartTime) / 1000;
-            let spawnInterval = 1500; // Default spawn interval (ms)
-            let speedMultiplier = 1; // Speed multiplier for obstacles
+            let spawnInterval = 1500;
+            let speedMultiplier = 1;
             
-            // Increase difficulty every 30 seconds
             if (gameTimeSeconds >= 90) {
-                spawnInterval = 600; // Very frequent spawning
+                spawnInterval = 600;
                 speedMultiplier = 1.8;
             } else if (gameTimeSeconds >= 60) {
-                spawnInterval = 900; // More frequent spawning
+                spawnInterval = 900;
                 speedMultiplier = 1.5;
             } else if (gameTimeSeconds >= 30) {
-                spawnInterval = 1200; // Slightly more frequent
+                spawnInterval = 1200;
                 speedMultiplier = 1.2;
             }
             
@@ -521,7 +679,6 @@
         }
 
         function checkCollisions() {
-            // Check phone collisions
             game.phones = game.phones.filter(phone => {
                 if (phone.x < game.yuki.x + game.yuki.width &&
                     phone.x + phone.width > game.yuki.x &&
@@ -534,7 +691,6 @@
                 return phone.y < 600;
             });
 
-            // Check power-up collisions
             game.powerUps = game.powerUps.filter(powerUp => {
                 if (powerUp.x < game.yuki.x + game.yuki.width &&
                     powerUp.x + powerUp.width > game.yuki.x &&
@@ -548,7 +704,6 @@
                 return powerUp.y < 600;
             });
 
-            // Check obstacle collisions
             if (!game.invincible) {
                 for (let obstacle of game.obstacles) {
                     if (obstacle.x < game.yuki.x + game.yuki.width &&
@@ -576,15 +731,50 @@
             document.getElementById('final-time').textContent = finalTime + 's';
             document.getElementById('final-difficulty').textContent = difficultyInfo.name;
             
+            // Show rank information
+            showRankInfo(game.score, finalTime);
+            
             gameState = 'gameOver';
             showScreen('game-over-screen');
         }
 
+        function showRankInfo(score, time) {
+            const rankDisplay = document.getElementById('rank-display');
+            const rankText = document.getElementById('rank-text');
+            
+            // Calculate rank for phones
+            let phoneRank = 1;
+            for (let entry of globalLeaderboard.mostPhones) {
+                if (entry.score > score) phoneRank++;
+            }
+            
+            // Calculate rank for time (only if score > 0)
+            let timeRank = 1;
+            if (score > 0) {
+                for (let entry of globalLeaderboard.bestTime) {
+                    if (entry.time < time) timeRank++;
+                }
+            }
+            
+            if (score > 0) {
+                if (phoneRank === 1) {
+                    rankText.textContent = "NEW WORLD RECORD! 🥇";
+                } else if (phoneRank <= 3) {
+                    rankText.textContent = `${phoneRank === 2 ? '🥈' : '🥉'} #${phoneRank} on Global Leaderboard!`;
+                } else if (phoneRank <= 10) {
+                    rankText.textContent = `Top 10 Global! Ranked #${phoneRank}`;
+                } else {
+                    rankText.textContent = `Global Rank: #${phoneRank}`;
+                }
+                rankDisplay.style.display = 'block';
+            } else {
+                rankDisplay.style.display = 'none';
+            }
+        }
+
         function drawGame() {
-            // Clear canvas
             ctx.clearRect(0, 0, 800, 600);
 
-            // Apply screen shake
             if (game.screenShake > 0) {
                 ctx.save();
                 ctx.translate(
@@ -593,14 +783,14 @@
                 );
             }
 
-            // Draw underwater background
+            // Background
             const gradient = ctx.createLinearGradient(0, 0, 0, 600);
             gradient.addColorStop(0, '#4a90e2');
             gradient.addColorStop(1, '#1e3a5f');
             ctx.fillStyle = gradient;
             ctx.fillRect(0, 0, 800, 600);
 
-            // Draw bubbles
+            // Bubbles
             ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
             for (let i = 0; i < 20; i++) {
                 const x = (Date.now() / 50 + i * 40) % 800;
@@ -610,7 +800,7 @@
                 ctx.fill();
             }
 
-            // Draw Yuki as a person
+            // Draw Yuki
             const yukiX = game.yuki.x;
             const yukiY = game.yuki.y;
             
@@ -729,52 +919,95 @@
             }
         }
 
-        function submitScore() {
+        async function submitScore() {
             const finalTime = Math.floor((Date.now() - game.gameStartTime) / 1000);
-            const playerName = document.getElementById('player-name').value || 'Anonymous';
+            const playerName = document.getElementById('player-name').value.trim() || 'Anonymous';
+            const submitBtn = document.getElementById('submit-btn');
             
-            const newEntry = {
-                name: playerName,
-                score: game.score,
-                time: finalTime,
-                date: new Date().toLocaleDateString()
-            };
+            // Disable button and show loading
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Submitting...';
+            
+            try {
+                // Try to submit to Firebase first
+                const success = await submitScoreToFirebase(playerName, game.score, finalTime);
+                
+                if (success) {
+                    submitBtn.textContent = 'Submitted! 🎉';
+                    setTimeout(() => {
+                        hideNameInput();
+                        showMenu();
+                    }, 1500);
+                } else {
+                    throw new Error('Firebase submission failed');
+                }
+            } catch (error) {
+                console.error('Error submitting score:', error);
+                
+                // Fallback to local storage
+                const localLeaderboard = JSON.parse(localStorage.getItem('yukiPhoneCatchLocal') || '{"mostPhones":[],"bestTime":[]}');
+                
+                const newEntry = {
+                    name: playerName,
+                    score: game.score,
+                    time: finalTime,
+                    date: new Date().toLocaleDateString()
+                };
 
-            leaderboard.mostPhones.push(newEntry);
-            leaderboard.mostPhones.sort((a, b) => b.score - a.score);
-            leaderboard.mostPhones = leaderboard.mostPhones.slice(0, 10);
+                localLeaderboard.mostPhones.push(newEntry);
+                localLeaderboard.mostPhones.sort((a, b) => b.score - a.score);
+                localLeaderboard.mostPhones = localLeaderboard.mostPhones.slice(0, 10);
 
-            if (game.score > 0) {
-                leaderboard.bestTime.push(newEntry);
-                leaderboard.bestTime.sort((a, b) => a.time - b.time);
-                leaderboard.bestTime = leaderboard.bestTime.slice(0, 10);
+                if (game.score > 0) {
+                    localLeaderboard.bestTime.push(newEntry);
+                    localLeaderboard.bestTime.sort((a, b) => a.time - b.time);
+                    localLeaderboard.bestTime = localLeaderboard.bestTime.slice(0, 10);
+                }
+
+                localStorage.setItem('yukiPhoneCatchLocal', JSON.stringify(localLeaderboard));
+                
+                submitBtn.textContent = 'Saved Locally (Network Error)';
+                setTimeout(() => {
+                    hideNameInput();
+                    showMenu();
+                }, 2000);
             }
-
-            // Save to localStorage
-            localStorage.setItem('yukiPhoneCatchLeaderboard', JSON.stringify(leaderboard));
-
-            hideNameInput();
-            showMenu();
         }
 
         function updateLeaderboardDisplay() {
             const phonesDiv = document.getElementById('phones-leaderboard');
             const timeDiv = document.getElementById('time-leaderboard');
             
-            if (leaderboard.mostPhones.length > 0 || leaderboard.bestTime.length > 0) {
-                document.getElementById('leaderboard-display').classList.remove('hidden');
+            // Remove loading class
+            phonesDiv.classList.remove('loading');
+            timeDiv.classList.remove('loading');
+            
+            // Update phones leaderboard
+            if (globalLeaderboard.mostPhones.length > 0) {
+                phonesDiv.innerHTML = globalLeaderboard.mostPhones.slice(0, 8).map((entry, index) => {
+                    const rank = index + 1;
+                    const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : `#${rank}`;
+                    return `<div class="leaderboard-entry">
+                        <span>${medal} ${entry.name}</span>
+                        <span>${entry.score} phones</span>
+                    </div>`;
+                }).join('');
+            } else {
+                phonesDiv.innerHTML = '<div class="leaderboard-entry"><span>No global scores yet!</span><span>-</span></div>';
             }
 
-            if (leaderboard.mostPhones.length > 0) {
-                phonesDiv.innerHTML = leaderboard.mostPhones.slice(0, 5).map(entry => 
-                    `<div class="leaderboard-entry"><span>${entry.name}</span><span>${entry.score} phones</span></div>`
-                ).join('');
-            }
-
-            if (leaderboard.bestTime.length > 0) {
-                timeDiv.innerHTML = leaderboard.bestTime.slice(0, 5).map(entry => 
-                    `<div class="leaderboard-entry"><span>${entry.name}</span><span>${entry.time}s</span></div>`
-                ).join('');
+            // Update time leaderboard
+            if (globalLeaderboard.bestTime.length > 0) {
+                timeDiv.innerHTML = globalLeaderboard.bestTime.slice(0, 8).map((entry, index) => {
+                    const rank = index + 1;
+                    const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : `#${rank}`;
+                    return `<div class="leaderboard-entry">
+                        <span>${medal} ${entry.name}</span>
+                        <span>${entry.time}s</span>
+                    </div>`;
+                }).join('');
+            } else {
+                timeDiv.innerHTML = '<div class="leaderboard-entry"><span>No global times yet!</span><span>-</span></div>';
             }
         }
     </script>
