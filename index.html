@@ -15,21 +15,26 @@
             font-family: Arial, sans-serif;
             background: linear-gradient(180deg, #4a90e2 0%, #1e3a5f 100%);
             color: white;
-            overflow: hidden;
+            overflow-x: hidden;
+            margin: 0;
+            padding: 0;
         }
         
         .game-container {
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
+            justify-content: flex-start;
             min-height: 100vh;
             padding: 20px;
+            overflow-y: auto;
         }
         
         .menu-screen, .game-over-screen {
             text-align: center;
             max-width: 900px;
+            width: 100%;
+            padding-bottom: 40px;
         }
         
         .game-screen {
@@ -120,14 +125,16 @@
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 2rem;
-            margin-top: 2rem;
+            margin: 2rem 0;
             max-width: 700px;
+            width: 100%;
         }
         
         .leaderboard-section {
             background: rgba(30, 58, 95, 0.8);
             padding: 1.5rem;
             border-radius: 10px;
+            min-height: 200px;
         }
         
         .leaderboard h3 {
@@ -194,12 +201,39 @@
             
             .leaderboard {
                 grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            
+            .game-container {
+                padding: 15px;
             }
             
             canvas {
                 width: 100%;
                 max-width: 400px;
                 height: auto;
+            }
+        }
+        
+        @media (max-height: 700px) {
+            .game-container {
+                justify-content: flex-start;
+                padding-top: 10px;
+            }
+            
+            h1 {
+                font-size: 3rem;
+                margin-bottom: 0.5rem;
+            }
+            
+            h2 {
+                font-size: 1.5rem;
+                margin-bottom: 1rem;
+            }
+            
+            .instructions {
+                margin: 1rem 0;
+                padding: 1rem;
             }
         }
     </style>
@@ -243,6 +277,9 @@
                     </div>
                 </div>
             </div>
+            
+            <!-- Bottom spacing for better mobile experience -->
+            <div style="height: 20px;"></div>
         </div>
 
         <!-- Game Screen -->
