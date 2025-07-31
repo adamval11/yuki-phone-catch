@@ -296,7 +296,7 @@
             <canvas id="gameCanvas" width="800" height="600"></canvas>
             <div class="game-ui">
                 <div class="controls">Use Arrow Keys or WASD to move Yuki around!</div>
-                <div class="tip">Catch the phones, avoid obstacles, grab Red Bull for power!</div>
+                <div class="tip">Catch the phones, avoid obstacles, grab Red Bull for power! 📱 On mobile: Touch and drag to move Yuki! </div>
                 <div id="difficulty-display" class="difficulty-indicator">
                     Difficulty: Normal
                 </div>
@@ -534,6 +534,62 @@
             keys[e.key.toLowerCase()] = false;
         });
 
+        // Touch controls for mobile
+        let touchStartX = null;
+        let touchStartY = null;
+        let touchCurrentX = null;
+        let touchCurrentY = null;
+        let isTouching = false;
+
+        // Add touch event listeners to the canvas when game starts
+        function addTouchControls() {
+            const canvas = document.getElementById('gameCanvas');
+            if (!canvas) return;
+
+            canvas.addEventListener('touchstart', handleTouchStart, { passive: false });
+            canvas.addEventListener('touchmove', handleTouchMove, { passive: false });
+            canvas.addEventListener('touchend', handleTouchEnd, { passive: false });
+        }
+
+        function removeTouchControls() {
+            const canvas = document.getElementById('gameCanvas');
+            if (!canvas) return;
+
+            canvas.removeEventListener('touchstart', handleTouchStart);
+            canvas.removeEventListener('touchmove', handleTouchMove);
+            canvas.removeEventListener('touchend', handleTouchEnd);
+        }
+
+        function handleTouchStart(e) {
+            e.preventDefault();
+            const touch = e.touches[0];
+            const rect = e.target.getBoundingClientRect();
+            touchStartX = touch.clientX - rect.left;
+            touchStartY = touch.clientY - rect.top;
+            touchCurrentX = touchStartX;
+            touchCurrentY = touchStartY;
+            isTouching = true;
+        }
+
+        function handleTouchMove(e) {
+            e.preventDefault();
+            if (!isTouching) return;
+            
+            const touch = e.touches[0];
+            const rect = e.target.getBoundingClientRect();
+            touchCurrentX = touch.clientX - rect.left;
+            touchCurrentY = touch.clientY - rect.top;
+        }
+
+        function handleTouchEnd(e) {
+            e.preventDefault();
+            isTouching = false;
+            touchStartX = null;
+            touchStartY = null;
+            touchCurrentX = null;
+            touchCurrentY = null;
+        }
+
         // Screen management
         function showScreen(screenId) {
             document.querySelectorAll('.menu-screen, .game-screen, .game-over-screen').forEach(s => s.classList.add('hidden'));
@@ -661,6 +717,10 @@
             
             gameState = 'playing';
             showScreen('game-screen');
+
+            // Add touch controls for mobile
+            addTouchControls();
+            
             gameLoop();
         }
 
@@ -689,20 +749,41 @@
                 game.screenShake--;
             }
 
-            // Move Yuki
-            const speed = game.invincible ? game.yuki.speed * 1.5 : game.yuki.speed;
-            if (keys['arrowleft'] || keys['a']) {
-                game.yuki.x = Math.max(0, game.yuki.x - speed);
-            }
-            if (keys['arrowright'] || keys['d']) {
-                game.yuki.x = Math.min(760, game.yuki.x + speed);
-            }
-            if (keys['arrowup'] || keys['w']) {
-                game.yuki.y = Math.max(0, game.yuki.y - speed);
-            }
-            if (keys['arrowdown'] || keys['s']) {
-                game.yuki.y = Math.min(538, game.yuki.y + speed);
-            }
+// Move Yuki based on keyboard input OR touch input
+const speed = game.invincible ? game.yuki.speed * 1.5 : game.yuki.speed;
+
+// Keyboard controls
+if (keys['arrowleft'] || keys['a']) {
+    game.yuki.x = Math.max(0, game.yuki.x - speed);
+}
+if (keys['arrowright'] || keys['d']) {
+    game.yuki.x = Math.min(760, game.yuki.x + speed);
+}
+if (keys['arrowup'] || keys['w']) {
+    game.yuki.y = Math.max(0, game.yuki.y - speed);
+}
+if (keys['arrowdown'] || keys['s']) {
+    game.yuki.y = Math.min(538, game.yuki.y + speed);
+}
+
+// Touch controls - move Yuki towards touch position
+if (isTouching && touchCurrentX !== null && touchCurrentY !== null) {
+    const targetX = (touchCurrentX / 800) * 800; // Scale to canvas coordinates
+    const targetY = (touchCurrentY / 600) * 600;
+    
+    const deltaX = targetX - (game.yuki.x + game.yuki.width / 2);
+    const deltaY = targetY - (game.yuki.y + game.yuki.height / 2);
+    
+    // Move towards touch position with smooth movement
+    const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+    if (distance > 5) { // Only move if touch is far enough away
+        const normalizedX = deltaX / distance;
+        const normalizedY = deltaY / distance;
+        
+        game.yuki.x = Math.max(0, Math.min(760, game.yuki.x + normalizedX * speed));
+        game.yuki.y = Math.max(0, Math.min(538, game.yuki.y + normalizedY * speed));
+    }
+}
 
             spawnPhone(currentTime);
             spawnObstacle(currentTime);
@@ -829,6 +910,9 @@
             game.gameRunning = false;
             game.screenShake = 20;
             cancelAnimationFrame(animationId);
+
+            // Remove touch controls when game ends
+            removeTouchControls();
             
             const finalTime = Math.floor((Date.now() - game.gameStartTime) / 1000);
             const difficultyInfo = getDifficultyInfo(finalTime);
