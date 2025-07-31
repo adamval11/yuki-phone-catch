@@ -461,7 +461,7 @@
                 // Listen to time leaderboard
                 const timeQuery = query(
                     collection(window.db, 'leaderboard-time'), 
-                    orderBy('time', 'asc'), 
+                    orderBy('time', 'desc'), 
                     limit(10)
                 );
                 
@@ -872,7 +872,7 @@
             let timeRank = 1;
             if (score > 0) {
                 for (let entry of globalLeaderboard.bestTime) {
-                    if (entry.time < time) timeRank++;
+                    if (entry.time > time) timeRank++;
                 }
             }
             
