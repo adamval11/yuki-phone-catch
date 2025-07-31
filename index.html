@@ -1,9 +1,4 @@
-.menu-screen {
-            text-align: center;
-            max-width: 900px;
-            width: 100%;
-            padding-bottom: 40px;
-        }<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -11,12 +6,12 @@
     <title>Yuki's Phone Catch - Lake Como Rescue</title>
     
     <!-- Google Analytics 4 -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-BEWXGM4DF4"></script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=GA_MEASUREMENT_ID"></script>
     <script>
         window.dataLayer = window.dataLayer || [];
         function gtag(){dataLayer.push(arguments);}
         gtag('js', new Date());
-        gtag('config', 'G-BEWXGM4DF4');
+        gtag('config', 'GA_MEASUREMENT_ID');
     </script>
     <style>
         * {
@@ -44,51 +39,28 @@
             overflow-y: auto;
         }
         
-        .game-over-screen {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(180deg, #4a90e2 0%, #1e3a5f 100%);
-            z-index: 5;
-            overflow-y: auto;
-            padding: 20px;
+        .menu-screen, .game-over-screen {
+            text-align: center;
+            max-width: 900px;
+            width: 100%;
+            padding-bottom: 40px;
         }
         
         .game-screen {
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(180deg, #4a90e2 0%, #1e3a5f 100%);
-            z-index: 5;
         }
         
         h1 {
             font-size: 4rem;
             margin-bottom: 1rem;
             color: #ffd700;
-            text-align: center;
-            width: 100%;
         }
         
         h2 {
             font-size: 2rem;
             margin-bottom: 2rem;
-            text-align: center;
-            width: 100%;
         }
         
         .instructions {
@@ -96,8 +68,6 @@
             padding: 1.5rem;
             border-radius: 10px;
             margin: 2rem 0;
-            max-width: 700px;
-            width: 100%;
         }
         
         .controls {
@@ -118,10 +88,8 @@
             font-size: 1.2rem;
             border-radius: 8px;
             cursor: pointer;
-            margin: 10px auto;
+            margin: 10px;
             transition: background-color 0.3s;
-            display: block;
-            width: fit-content;
         }
         
         button:hover {
@@ -155,22 +123,20 @@
             text-align: center;
         }
         
-        .game-over-screen .stats {
+        .stats {
             background: rgba(30, 58, 95, 0.9);
             padding: 1.5rem;
             border-radius: 10px;
             margin: 1rem 0;
-            max-width: 500px;
         }
         
         .leaderboard {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 2rem;
-            margin: 2rem auto;
+            margin: 2rem 0;
             max-width: 700px;
             width: 100%;
-            justify-self: center;
         }
         
         .leaderboard-section {
@@ -227,25 +193,6 @@
             border-radius: 5px;
             margin: 1rem 0;
             font-size: 0.9rem;
-            max-width: 600px;
-            width: fit-content;
-        }
-        
-        .footer-text {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            font-size: 0.9rem;
-            color: rgba(255, 255, 255, 0.7);
-            font-style: italic;
-            z-index: 10;
-            max-width: 300px;
-            text-align: right;
-            line-height: 1.3;
-        }
-        
-        .footer-text:hover {
-            color: rgba(255, 255, 255, 0.9);
         }
         
         .firebase-status.error {
@@ -274,23 +221,6 @@
                 width: 100%;
                 max-width: 400px;
                 height: auto;
-            }
-            
-            #footer-desktop {
-                display: none;
-            }
-            
-            .footer-text[style*="relative"] {
-                display: block !important;
-            }
-            
-            .game-screen {
-                position: fixed;
-                padding: 10px;
-            }
-            
-            .game-over-screen {
-                padding: 10px;
             }
         }
         
@@ -339,7 +269,7 @@
                     ⚡ Game gets progressively harder every 30 seconds!
                 </div>
             </div>
-            <button onclick="startGame()" style="margin: 2rem auto;">Start Diving! 🤿</button>
+            <button onclick="startGame()">Start Diving! 🤿</button>
             
             <!-- Global Leaderboard -->
             <div class="leaderboard">
@@ -359,17 +289,6 @@
             
             <!-- Bottom spacing for better mobile experience -->
             <div style="height: 20px;"></div>
-            
-            <!-- Footer text for mobile -->
-            <div class="footer-text" style="position: relative; bottom: auto; right: auto; text-align: center; display: none;">
-                Built to make sure Yuki doesn't drop another phone in Lake Como. 😄
-            </div>
-        </div>
-
-        <!-- Footer text for desktop (fixed position) -->
-        <div class="footer-text" id="footer-desktop">
-            Built to make sure Yuki doesn't drop another phone in Lake Como. 😄
-        </div>
         </div>
 
         <!-- Game Screen -->
